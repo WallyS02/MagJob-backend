@@ -1,10 +1,10 @@
 package com.keepitup.magjobbackend.member.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
 import java.util.List;
-
 @Getter
 @Setter
 @Builder
@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode
+@Schema(description = "GetMembersResponse DTO")
 public class GetMembersResponse {
 
     @Getter
@@ -23,16 +24,25 @@ public class GetMembersResponse {
     @EqualsAndHashCode
     public static class Member {
 
+        @Schema(description = "Member id value")
         private BigInteger id;
+
+        @Schema(description = "User id value")
         private BigInteger userId;
 
+        @Schema(description = "Member pseudonym value")
         private String pseudonym;
+
+        @Schema(description = "User firstname value")
         private String firstName;
+
+        @Schema(description = "User lastname value")
         private String lastName;
 
     }
 
     @Singular
+    @Schema(description = "Member list")
     private List<Member> members;
 
 }

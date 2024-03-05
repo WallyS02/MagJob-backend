@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.user.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -9,11 +10,19 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode
+@Schema(description = "PostUserRequest DTO")
 public class PostUserRequest {
 
+    @Schema(description = "User email value")
     private String email;
+
+    @Schema(description = "User firstname value")
     private String firstname;
+
+    @Schema(description = "User lastname value")
     private String lastname;
+
+    @Schema(description = "User password value")
     private String password;
 
 }

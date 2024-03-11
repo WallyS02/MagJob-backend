@@ -106,4 +106,14 @@ public interface UserController {
             @RequestBody
             PutPasswordRequest putPasswordRequest
     );
+
+    @Operation(summary = "Create authentication token")
+    @PostMapping("/api/users/login")
+    @ResponseStatus(HttpStatus.OK)
+    AuthenticationResponse createAuthenticationToken(
+            @RequestBody
+            AuthenticationRequest authenticationRequest,
+            HttpServletResponse response
+    ) throws IOException;
+
 }

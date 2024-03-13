@@ -5,7 +5,6 @@ import com.keepitup.magjobbackend.invitation.dto.GetInvitationResponse;
 import com.keepitup.magjobbackend.invitation.dto.GetInvitationsResponse;
 import com.keepitup.magjobbackend.invitation.dto.PostInvitationRequest;
 import com.keepitup.magjobbackend.member.dto.GetMemberResponse;
-import com.keepitup.magjobbackend.member.dto.PatchMemberRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,7 +49,7 @@ public interface InvitationController {
                     required = true
             )
             @PathVariable("userId")
-            BigInteger  userId
+            BigInteger userId
     );
 
     @Operation(summary = "Get Invitations By Organization")
@@ -130,5 +129,4 @@ public interface InvitationController {
             @RequestBody
             PostInvitationRequest request
     );
-
 }

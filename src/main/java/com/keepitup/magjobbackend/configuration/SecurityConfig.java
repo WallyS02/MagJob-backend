@@ -1,7 +1,10 @@
 package com.keepitup.magjobbackend.configuration;
 
+import com.keepitup.magjobbackend.jwt.CustomJwt;
+import com.keepitup.magjobbackend.jwt.CustomJwtConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -18,13 +22,13 @@ public class SecurityConfig {
     private static final AntPathRequestMatcher[] permitAllList = {
             /*new AntPathRequestMatcher("/api/users", "POST"),
             new AntPathRequestMatcher("/api/users/login")*/
+            new AntPathRequestMatcher("/v3/api-docs/**", "GET"),
+            new AntPathRequestMatcher("/swagger-ui/**"),
     };
 
     private static final AntPathRequestMatcher[] authenticatedList = {
             new AntPathRequestMatcher("/api/users/{id}"),
             new AntPathRequestMatcher("/api/users", "GET"),
-            new AntPathRequestMatcher("/v3/api-docs/**", "GET"),
-            new AntPathRequestMatcher("/swagger-ui/**"),
             new AntPathRequestMatcher("/actuator/**"),
             new AntPathRequestMatcher("/api/organizations"),
             new AntPathRequestMatcher("/api/organizations/{id}"),
@@ -45,25 +49,31 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    //Rest of old implementation
+    /*@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .authorizeHttpRequests(authorizeHttpRequests ->
-                        authorizeHttpRequests
-                                .requestMatchers(permitAllList).permitAll()
-                                .requestMatchers(authenticatedList).authenticated()
-                                .anyRequest().authenticated()
-                )
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer ->
-                        httpSecurityOAuth2ResourceServerConfigurer
-                                .jwt(Customizer.withDefaults())
+    }*/
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(permitAllList).permitAll()
+                        .requestMatchers(authenticatedList).authenticated()
+                        .anyRequest().authenticated()
                 )
-                .build();
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(
+                        jwt -> jwt.jwtAuthenticationConverter(customJwtConverter())
+                ));
+        return http.build();
+    }
+    @Bean
+    public Converter<Jwt, CustomJwt> customJwtConverter() {
+        return new CustomJwtConverter();
     }
 }

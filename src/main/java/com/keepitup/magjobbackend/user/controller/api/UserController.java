@@ -106,4 +106,5 @@ public interface UserController {
             @RequestBody
             PutPasswordRequest putPasswordRequest
     );
+
 }

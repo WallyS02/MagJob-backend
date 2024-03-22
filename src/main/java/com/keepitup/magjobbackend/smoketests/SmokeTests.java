@@ -112,7 +112,7 @@ public class SmokeTests {
         postUserRequest.setEmail(USER_EMAIL_TEST_VALUE);
         postUserRequest.setFirstname(USER_FIRSTNAME_TEST_VALUE);
         postUserRequest.setLastname(USER_LASTNAME_TEST_VALUE);
-        postUserRequest.setPassword(USER_PASSWORD_TEST_VALUE);
+        //postUserRequest.setPassword(USER_PASSWORD_TEST_VALUE);
 
         testUserPassword = USER_PASSWORD_TEST_VALUE;
 

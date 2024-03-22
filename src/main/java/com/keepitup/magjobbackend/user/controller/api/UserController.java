@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,17 +24,17 @@ public interface UserController {
     GetUsersResponse getUsers();
 
     @Operation(summary = "Get User")
-    @GetMapping("/api/users/{id}")
+    @GetMapping("/api/users/{externalId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetUserResponse getUser(
             @Parameter(
-                    name = "id",
-                    description = "User id value",
+                    name = "external id",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("id")
-            BigInteger id
+            @PathVariable("externalId")
+            String externalId
     );
 
     @Operation(summary = "Create User")
@@ -41,41 +42,34 @@ public interface UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     GetUserResponse createUser(
-            @Parameter(
-                    name = "PostUserRequest",
-                    description = "PostUserRequest DTO",
-                    schema = @Schema(implementation = PostUserRequest.class),
-                    required = true
-            )
-            @RequestBody
-            PostUserRequest postUserRequest
+            @RequestHeader String token
     );
 
     @Operation(summary = "Delete User")
-    @DeleteMapping("/api/users/{id}")
+    @DeleteMapping("/api/users/{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUser(
             @Parameter(
-                    name = "id",
-                    description = "User id value",
+                    name = "externalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("id")
-            BigInteger id
+            @PathVariable("externalId")
+            String externalId
     );
 
     @Operation(summary = "Update User")
-    @PatchMapping("/api/users/{id}")
+    @PatchMapping("/api/users/{externalId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetUserResponse updateUser(
             @Parameter(
-                    name = "id",
-                    description = "User id value",
+                    name = "externalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("id")
-            BigInteger id,
+            @PathVariable("externalId")
+            String externalId,
             @Parameter(
                     name = "PatchUserRequest",
                     description = "PatchUserRequest DTO",
@@ -85,26 +79,4 @@ public interface UserController {
             @RequestBody
             PatchUserRequest patchUserRequest
     );
-
-    @Operation(summary = "Update User Password")
-    @PutMapping("/api/users/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    void updateUserPassword(
-            @Parameter(
-                    name = "id",
-                    description = "User id value",
-                    required = true
-            )
-            @PathVariable("id")
-            BigInteger id,
-            @Parameter(
-                    name = "PutPasswordRequest",
-                    description = "putPasswordRequest DTO",
-                    schema = @Schema(implementation = PutPasswordRequest.class),
-                    required = true
-            )
-            @RequestBody
-            PutPasswordRequest putPasswordRequest
-    );
-
 }

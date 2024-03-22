@@ -16,13 +16,12 @@ public class PostUserRequest {
     @Schema(description = "User email value")
     private String email;
 
+    @Schema(description = "User external Id value")
+    private String externalId;
+
     @Schema(description = "User firstname value")
     private String firstname;
 
     @Schema(description = "User lastname value")
     private String lastname;
-
-    @Schema(description = "User password value")
-    private String password;
-
 }

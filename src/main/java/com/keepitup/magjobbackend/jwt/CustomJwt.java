@@ -10,6 +10,8 @@ public class CustomJwt extends JwtAuthenticationToken {
 
     private String firstname;
     private String lastname;
+    private String externalId;
+    private String email;
     public CustomJwt(Jwt jwt, Collection<? extends GrantedAuthority> authorities) {
         super(jwt, authorities);
     }
@@ -28,5 +30,21 @@ public class CustomJwt extends JwtAuthenticationToken {
 
     public void setFirstname(String firstname) {
         this.firstname = firstname;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

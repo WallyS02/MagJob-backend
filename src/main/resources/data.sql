@@ -1,10 +1,10 @@
-INSERT INTO users (id, email, firstname, lastname, password_hash, phone_number, birth_date)
+INSERT INTO users (id, email, firstname, lastname, phone_number, birth_date)
 VALUES
-    ('1', 'test1@mail.com', 'test1', 'test1', '$2a$10$HvE3TTHqLhz84OmKwXjRZu7J3cvYl/PdkPNnz49f0cMLxxzWgnX9C', '123456789', '1990-01-01'),
-    ('2', 'test2@mail.com', 'test2', 'test2', '$2a$10$HvE3TTHqLhz84OmKwXjRZu7J3cvYl/PdkPNnz49f0cMLxxzWgnX9C', '234567890', '1985-05-15'),
-    ('3', 'test3@mail.com', 'test3', 'test3', '$2a$10$HvE3TTHqLhz84OmKwXjRZu7J3cvYl/PdkPNnz49f0cMLxxzWgnX9C', '345678901', '1995-07-20'),
-    ('4', 'test4@mail.com', 'test4', 'test4', '$2a$10$HvE3TTHqLhz84OmKwXjRZu7J3cvYl/PdkPNnz49f0cMLxxzWgnX9C', '456789012', '1988-11-30'),
-    ('5', 'test5@mail.com', 'test5', 'test5', '$2a$10$HvE3TTHqLhz84OmKwXjRZu7J3cvYl/PdkPNnz49f0cMLxxzWgnX9C', '567890123', '1992-03-10');
+    ('1', 'test1@mail.com', 'test1', 'test1', '123456789', '1990-01-01'),
+    ('2', 'test2@mail.com', 'test2', 'test2', '234567890', '1985-05-15'),
+    ('3', 'test3@mail.com', 'test3', 'test3', '345678901', '1995-07-20'),
+    ('4', 'test4@mail.com', 'test4', 'test4', '456789012', '1988-11-30'),
+    ('5', 'test5@mail.com', 'test5', 'test5', '567890123', '1992-03-10');
 
 INSERT INTO organizations (id, name, date_of_creation, profile_banner_url)
 VALUES

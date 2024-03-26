@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface AnnouncementReceiverRepository  extends JpaRepository<AnnouncementReceiver, BigInteger> {
-    List<AnnouncementReceiver> findByMember(Member member);
+    List<AnnouncementReceiver> findAllByMember(Member member);
 
-    List<AnnouncementReceiver> findByAnnouncement(Announcement announcement);
+    List<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement);
 
     Optional<AnnouncementReceiver> findByMemberAndAnnouncement(Member member, Announcement announcement);
 }

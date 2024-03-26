@@ -32,13 +32,13 @@ public class AnnouncementReceiverDefaultService implements AnnouncementReceiverS
     }
 
     @Override
-    public List<AnnouncementReceiver> findByMember(Member member) {
-        return announcementReceiverRepository.findByMember(member);
+    public List<AnnouncementReceiver> findAllByMember(Member member) {
+        return announcementReceiverRepository.findAllByMember(member);
     }
 
     @Override
-    public List<AnnouncementReceiver> findByAnnouncement(Announcement announcement) {
-        return announcementReceiverRepository.findByAnnouncement(announcement);
+    public List<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement) {
+        return announcementReceiverRepository.findAllByAnnouncement(announcement);
     }
 
     @Override

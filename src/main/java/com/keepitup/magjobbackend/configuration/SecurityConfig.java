@@ -46,6 +46,8 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/organizations/{organizationId}/invitations"),
             new AntPathRequestMatcher("/api/users/{userId}/invitations"),
             new AntPathRequestMatcher("/api/invitations/{userId}/{organizationId}"),
+            new AntPathRequestMatcher("/api/tasks/**"),
+            new AntPathRequestMatcher("/api/assignees/**"),
             new AntPathRequestMatcher("/api/announcements"),
             new AntPathRequestMatcher("/api/announcements/{id}"),
             new AntPathRequestMatcher("/api/organizations/{organizationId}/announcements"),

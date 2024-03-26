@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.member.entity;
 
+import com.keepitup.magjobbackend.assignee.entity.Assignee;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.user.entity.User;
 import jakarta.persistence.*;
@@ -39,4 +40,7 @@ public class Member {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "member")
+    private List<Assignee> assignees;
 }

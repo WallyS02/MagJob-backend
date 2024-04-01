@@ -49,8 +49,15 @@ public class UserDefaultController implements UserController {
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("isAuthenticated()")
     public GetUserResponse getUser(String externalId) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserId = jwt.getExternalId();
+
+        if (!loggedInUserId.equals(externalId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
+        }
+
         return service.findByExternalId(externalId)
                 .map(userToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -58,11 +65,7 @@ public class UserDefaultController implements UserController {
 
     @Override
     @PreAuthorize("permitAll()")
-    public GetUserResponse createUser(String token) {
-        if (token == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
+    public GetUserResponse createUser() {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
 
         Optional<User> user = service.findByExternalId(jwt.getExternalId());

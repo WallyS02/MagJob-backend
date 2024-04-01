@@ -41,9 +41,7 @@ public interface UserController {
     @PostMapping("/api/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    GetUserResponse createUser(
-            @RequestHeader String token
-    );
+    GetUserResponse createUser();
 
     @Operation(summary = "Delete User")
     @DeleteMapping("/api/users/{externalId}")

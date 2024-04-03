@@ -12,6 +12,8 @@ public interface UserService {
 
     Optional<User> find(String email);
 
+    Optional<User> findByExternalId(String externalId);
+
     List<User> findAllByFirstname(String firstname);
 
     List<User> findAllByLastname(String lastname);
@@ -21,6 +23,8 @@ public interface UserService {
     void register(User user);
 
     void delete(BigInteger id);
+
+    void deleteByExternalId(String externalId);
 
     void update(User user);
 }

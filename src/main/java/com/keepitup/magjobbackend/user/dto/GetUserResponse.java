@@ -15,8 +15,8 @@ import java.time.LocalDate;
 @Schema(description = "GetUserResponse DTO")
 public class GetUserResponse {
 
-    @Schema(description = "User id value")
-    private BigInteger id;
+    @Schema(description = "User external Id value")
+    private String externalId;
 
     @Schema(description = "User email value")
     private String email;

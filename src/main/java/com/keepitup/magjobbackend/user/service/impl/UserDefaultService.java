@@ -55,8 +55,12 @@ public class UserDefaultService implements UserService {
     }
 
     @Override
+    public Optional<User> findByExternalId(String externalId) {
+        return userRepository.findByExternalId(externalId);
+    }
+
+    @Override
     public void register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -66,8 +70,12 @@ public class UserDefaultService implements UserService {
     }
 
     @Override
+    public void deleteByExternalId(String externalId) {
+        userRepository.findByExternalId(externalId).ifPresent(userRepository::delete);
+    }
+
+    @Override
     public void update(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 }

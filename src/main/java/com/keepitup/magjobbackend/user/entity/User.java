@@ -28,6 +28,10 @@ public class User {
     @SequenceGenerator(name = "userSequenceGenerator")
     private BigInteger id;
 
+    @Size(min = 5, max = 254)
+    @Column(length = 254, unique = true)
+    private String externalId;
+
     @Email
     @Size(min = 5, max = 254)
     @Column(length = 254, unique = true)
@@ -40,11 +44,6 @@ public class User {
     @Size(max = 50)
     @Column(length = 50)
     private String lastname;
-
-    @NotNull
-    @Size(min = 60, max = 60)
-    @Column(name = "password_hash", length = 60, nullable = false)
-    private String password;
 
     @Column(name = "phone_number", length = 9, unique = true)
     private String phoneNumber;

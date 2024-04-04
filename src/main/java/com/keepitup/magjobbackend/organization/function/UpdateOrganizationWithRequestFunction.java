@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.organization.function;
 
 import com.keepitup.magjobbackend.organization.dto.PatchOrganizationRequest;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import com.keepitup.magjobbackend.user.utils.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.function.BiFunction;
@@ -13,7 +14,7 @@ public class UpdateOrganizationWithRequestFunction implements BiFunction<Organiz
         return Organization.builder()
                 .id(organization.getId())
                 .name(request.getName())
-                .profileBannerUrl(request.getProfileBannerUrl())
+                .banner(ImageUtil.compressImage(request.getBanner()))
                 .dateOfCreation(organization.getDateOfCreation())
                 .build();
     }

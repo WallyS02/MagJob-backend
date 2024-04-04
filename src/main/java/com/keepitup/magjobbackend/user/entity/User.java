@@ -52,6 +52,10 @@ public class User {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Lob
+    @Column(name = "image", length = 1000)
+    private byte[] image;
+
     @OneToMany(mappedBy = "user")
     private List<Member> memberships;
 

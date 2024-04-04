@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.organization.function;
 
 import com.keepitup.magjobbackend.organization.dto.GetOrganizationResponse;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import com.keepitup.magjobbackend.user.utils.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
@@ -15,7 +16,7 @@ public class OrganizationToResponseFunction implements Function<Organization, Ge
                 .id(organization.getId())
                 .dateOfCreation(organization.getDateOfCreation())
                 .name(organization.getName())
-                .profileBannerUrl(organization.getProfileBannerUrl())
+                .banner(ImageUtil.decompressImage(organization.getBanner()))
                 .build();
     }
 }

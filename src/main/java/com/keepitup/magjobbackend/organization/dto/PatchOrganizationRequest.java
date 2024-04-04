@@ -16,7 +16,6 @@ public class PatchOrganizationRequest {
     @Schema(description = "Organization name value")
     private String name;
 
-    @Schema(description = "Organization profile banner url value")
-    private String profileBannerUrl;
-
+    @Schema(description = "Organization profile banner")
+    private byte[] banner;
 }

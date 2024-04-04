@@ -46,5 +46,5 @@ public class GetAnnouncementResponse {
     private ZonedDateTime dateOfExpiration;
 
     @Schema(description = "Organization class value")
-    private GetMemberResponse.Organization organization;
+    private GetAnnouncementResponse.Organization organization;
 }

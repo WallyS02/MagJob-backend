@@ -2,9 +2,12 @@ package com.keepitup.magjobbackend.material.function;
 
 import com.keepitup.magjobbackend.material.dto.PatchMaterialRequest;
 import com.keepitup.magjobbackend.material.entity.Material;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.function.BiFunction;
 
+@Component
 public class UpdateMaterialWithRequestFunction implements BiFunction<Material, PatchMaterialRequest, Material> {
     @Override
     public Material apply(Material material, PatchMaterialRequest request) {

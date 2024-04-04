@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -28,6 +29,9 @@ public class PostMaterialRequest {
 
     @Schema(description = "Material content")
     private byte[] content;
+
+    @Schema(description = "Material date of creation")
+    private ZonedDateTime dateOfCreation;
 
     @Schema(description = "Material organization id value")
     private BigInteger organization;

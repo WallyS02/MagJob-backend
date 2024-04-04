@@ -2,9 +2,11 @@ package com.keepitup.magjobbackend.materialreceiver.function;
 
 import com.keepitup.magjobbackend.materialreceiver.dto.GetMaterialReceiverResponse;
 import com.keepitup.magjobbackend.materialreceiver.entity.MaterialReceiver;
+import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+@Component
 public class MaterialReceiverToResponseFunction implements Function<MaterialReceiver, GetMaterialReceiverResponse> {
     @Override
     public GetMaterialReceiverResponse apply(MaterialReceiver materialReceiver) {

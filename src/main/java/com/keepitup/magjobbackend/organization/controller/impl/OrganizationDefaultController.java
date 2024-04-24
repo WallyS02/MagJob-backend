@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.organization.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.controller.api.OrganizationController;
@@ -29,7 +30,7 @@ public class OrganizationDefaultController implements OrganizationController {
     private final UpdateOrganizationWithRequestFunction updateOrganizationWithRequest;
     private final MemberService memberService;
     private final UserService userService;
-
+    private final KeycloakController keycloakController;
 
     @Autowired
     public OrganizationDefaultController(
@@ -39,7 +40,8 @@ public class OrganizationDefaultController implements OrganizationController {
             OrganizationsToResponseFunction organizationsToResponse,
             OrganizationToResponseFunction organizationToResponse,
             RequestToOrganizationFunction requestToOrganization,
-            UpdateOrganizationWithRequestFunction updateOrganizationWithRequest
+            UpdateOrganizationWithRequestFunction updateOrganizationWithRequest,
+            KeycloakController keycloakController
     ) {
         this.service = service;
         this.memberService = memberService;
@@ -48,6 +50,7 @@ public class OrganizationDefaultController implements OrganizationController {
         this.organizationToResponse = organizationToResponse;
         this.requestToOrganization = requestToOrganization;
         this.updateOrganizationWithRequest = updateOrganizationWithRequest;
+        this.keycloakController = keycloakController;
     }
 
     @Override
@@ -89,6 +92,8 @@ public class OrganizationDefaultController implements OrganizationController {
                         .user(user.get())
                         .build());
             }
+
+            keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getExternalId());
         }
         return service.findByName(postOrganizationRequest.getName())
                 .map(organizationToResponse)

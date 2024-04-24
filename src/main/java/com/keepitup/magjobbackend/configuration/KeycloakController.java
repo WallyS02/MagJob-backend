@@ -1,0 +1,75 @@
+package com.keepitup.magjobbackend.configuration;
+
+import jakarta.ws.rs.core.Response;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.keycloak.admin.client.CreatedResponseUtil;
+
+@Component
+public class KeycloakController {
+    public static final String[] childGroupNames = {"Owner", "Moderator", "Member"};
+
+    final KeycloakSecurityUtil keycloakUtil;
+
+    @Value("${realm}")
+    private String realm;
+
+    public KeycloakController(KeycloakSecurityUtil keycloakUtil) {
+        this.keycloakUtil = keycloakUtil;
+    }
+
+    public void createGroupRepresentation(String organizationName, String userExternalId) {
+        GroupRepresentation parentGroupRepresentation = new GroupRepresentation();
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+
+        parentGroupRepresentation.setName(organizationName);
+
+        addGroupToKeycloak(parentGroupRepresentation, keycloak);
+
+        for (String childGroupName : childGroupNames) {
+            addChildGroupToKeycloak(keycloak, parentGroupRepresentation.getId(), childGroupName, userExternalId);
+        }
+    }
+
+    public void addUserToKeycloakGroup(String organizationName, String userExternalId) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/Member");
+        try {
+            keycloak.realm(realm).users().get(userExternalId).joinGroup(groupRepresentation.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //TODO Modify method to remove from all subgroups in Keycloak
+    public void removeUserFromKeycloakGroup(String organizationName, String userExternalId) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/Member");
+        try {
+            keycloak.realm(realm).users().get(userExternalId).leaveGroup(groupRepresentation.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private GroupRepresentation addGroupToKeycloak(GroupRepresentation groupRepresentation, Keycloak keycloak) {
+        try (Response response = keycloak.realm(realm).groups().add(groupRepresentation)) {
+            String groupId = CreatedResponseUtil.getCreatedId(response);
+            groupRepresentation.setId(groupId);
+            return groupRepresentation;
+        }
+    }
+
+    private void addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, String userExternalId) {
+        GroupRepresentation childGroup = new GroupRepresentation();
+        childGroup.setName(childGroupName);
+        try (Response response = keycloak.realm(realm).groups().group(parentGroupId).subGroup(childGroup)){
+            if (childGroup.getName().equals("Owner")) {
+                String childGroupId = CreatedResponseUtil.getCreatedId(response);
+                keycloak.realm(realm).users().get(userExternalId).joinGroup(childGroupId);
+            }
+        }
+    }
+}

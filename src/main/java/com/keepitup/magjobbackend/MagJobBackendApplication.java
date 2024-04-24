@@ -1,5 +1,7 @@
 package com.keepitup.magjobbackend;
 
+import com.keepitup.magjobbackend.configuration.KeycloakController;
+import com.keepitup.magjobbackend.configuration.KeycloakSecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +15,7 @@ public class MagJobBackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MagJobBackendApplication.class, args);
+		new KeycloakController(new KeycloakSecurityUtil());
 	}
 
 	@Bean

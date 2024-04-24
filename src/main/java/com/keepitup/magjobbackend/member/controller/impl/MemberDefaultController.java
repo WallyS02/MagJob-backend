@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.member.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
 import com.keepitup.magjobbackend.member.dto.*;
 import com.keepitup.magjobbackend.member.entity.Member;
@@ -29,6 +30,7 @@ public class MemberDefaultController implements MemberController {
     private final MemberToResponseFunction memberToResponse;
     private final RequestToMemberFunction requestToMember;
     private final UpdateMemberWithRequestFunction updateMemberWithRequest;
+    private final KeycloakController keycloakController;
 
     @Autowired
     public MemberDefaultController(
@@ -38,7 +40,8 @@ public class MemberDefaultController implements MemberController {
             MembersToResponseFunction membersToResponse,
             MemberToResponseFunction memberToResponse,
             RequestToMemberFunction requestToMember,
-            UpdateMemberWithRequestFunction updateMemberWithRequest
+            UpdateMemberWithRequestFunction updateMemberWithRequest,
+            KeycloakController keycloakController
     ) {
         this.service = service;
         this.userService = userService;
@@ -47,6 +50,7 @@ public class MemberDefaultController implements MemberController {
         this.memberToResponse = memberToResponse;
         this.requestToMember = requestToMember;
         this.updateMemberWithRequest = updateMemberWithRequest;
+        this.keycloakController = keycloakController;
     }
 
     @Override
@@ -83,6 +87,8 @@ public class MemberDefaultController implements MemberController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
             service.create(requestToMember.apply(postMemberRequest));
+
+            keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getExternalId());
         }
         return service.findByUserAndOrganization(user.get(), organization.get())
                 .map(memberToResponse)
@@ -91,7 +97,13 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public void deleteMember(BigInteger id) {
-        service.findByIdAndIsStillMember(id, true)
+        Optional<Member> memberToDelete = service.findByIdAndIsStillMember(id, true);
+        memberToDelete.ifPresent(member -> keycloakController.removeUserFromKeycloakGroup(
+                member.getOrganization().getName(),
+                member.getUser().getExternalId()
+        ));
+
+        memberToDelete
                 .ifPresentOrElse(
                         member -> service.delete(id),
                         () -> {

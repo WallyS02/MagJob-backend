@@ -1,6 +1,9 @@
 package com.keepitup.magjobbackend.member.entity;
 
+import com.keepitup.magjobbackend.announcementreceiver.entity.AnnouncementReceiver;
+import com.keepitup.magjobbackend.assignee.entity.Assignee;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import com.keepitup.magjobbackend.rolemember.entity.RoleMember;
 import com.keepitup.magjobbackend.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +11,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,4 +43,13 @@ public class Member {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+  
+    @OneToMany(mappedBy = "member")
+    private List<Assignee> assignees;
+
+    @OneToMany(mappedBy = "member")
+    private List<AnnouncementReceiver> announcementReceivers;
+
+    @OneToMany(mappedBy = "member")
+    private List<RoleMember> roleMembers;
 }

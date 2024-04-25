@@ -37,9 +37,9 @@ public class Organization {
     @Column(name = "date_of_creation")
     private ZonedDateTime dateOfCreation;
 
-    @URL
-    @Column(name = "profile_banner_url", length = 50)
-    private String profileBannerUrl;
+    @Lob
+    @Column(name = "banner", length = 1000)
+    private byte[] banner;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
     private List<Member> members;

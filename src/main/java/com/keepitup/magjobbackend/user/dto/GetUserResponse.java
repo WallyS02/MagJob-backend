@@ -32,4 +32,7 @@ public class GetUserResponse {
 
     @Schema(description = "User birth date value")
     private LocalDate birthDate;
+
+    @Schema(description = "User image")
+    private byte[] image;
 }

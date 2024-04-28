@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.keycloak.admin.client.CreatedResponseUtil;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class KeycloakController {
     public KeycloakController(KeycloakSecurityUtil keycloakUtil) {
         this.keycloakUtil = keycloakUtil;
     }
+
 
     public Map<String, String> createGroupRepresentation(String organizationName, String userExternalId) {
         GroupRepresentation parentGroupRepresentation = new GroupRepresentation();

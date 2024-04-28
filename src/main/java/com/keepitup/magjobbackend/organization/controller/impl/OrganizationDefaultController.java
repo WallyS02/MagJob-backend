@@ -126,6 +126,8 @@ public class OrganizationDefaultController implements OrganizationController {
                             .build());
                 }
             }
+
+            keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getExternalId());
         }
         return service.findByName(postOrganizationRequest.getName())
                 .map(organizationToResponse)

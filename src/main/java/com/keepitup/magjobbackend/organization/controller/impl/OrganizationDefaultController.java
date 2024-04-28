@@ -102,7 +102,7 @@ public class OrganizationDefaultController implements OrganizationController {
                 roleName2groupExternalId =
                         keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getExternalId());
 
-                for (String roleName : Constants.defaultRoleNames) {
+                for (String roleName : Constants.DEFAULT_ROLE_NAMES) {
                     roleService.create(Role.builder()
                             .name(roleName)
                             .organization(createdOrganization.get())
@@ -111,13 +111,13 @@ public class OrganizationDefaultController implements OrganizationController {
                 }
 
                 memberService.create(Member.builder()
-                        .pseudonym("Owner")
+                        .pseudonym(Constants.ROLE_NAME_OWNER)
                         .organization(createdOrganization.get())
                         .user(user.get())
                         .build());
 
                 Optional<Member> ownerMember = memberService.findByUserAndOrganization(user.get(), createdOrganization.get());
-                Optional<Role> ownerRole = roleService.findByExternalId(roleName2groupExternalId.get("Owner"));
+                Optional<Role> ownerRole = roleService.findByExternalId(roleName2groupExternalId.get(Constants.ROLE_NAME_OWNER));
 
                 if (ownerMember.isPresent() && ownerRole.isPresent()) {
                     roleMemberService.create(RoleMember.builder()

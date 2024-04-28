@@ -4,7 +4,6 @@ import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.rolemember.entity.RoleMember;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -30,7 +29,7 @@ public class Role {
     private String externalId;
 
     @NotNull
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne

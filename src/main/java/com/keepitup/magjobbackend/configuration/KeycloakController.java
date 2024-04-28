@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.keycloak.admin.client.CreatedResponseUtil;
 
+
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class KeycloakController {
-    public static final String[] childGroupNames = {"Owner", "Moderator", "Member"};
-
     final KeycloakSecurityUtil keycloakUtil;
 
     @Value("${realm}")
@@ -20,17 +22,25 @@ public class KeycloakController {
         this.keycloakUtil = keycloakUtil;
     }
 
-    public void createGroupRepresentation(String organizationName, String userExternalId) {
+
+    public Map<String, String> createGroupRepresentation(String organizationName, String userExternalId) {
         GroupRepresentation parentGroupRepresentation = new GroupRepresentation();
+        Map<String, String> roleName2ExternalId = new HashMap<>();
+
         Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 
         parentGroupRepresentation.setName(organizationName);
 
         addGroupToKeycloak(parentGroupRepresentation, keycloak);
 
-        for (String childGroupName : childGroupNames) {
-            addChildGroupToKeycloak(keycloak, parentGroupRepresentation.getId(), childGroupName, userExternalId);
+        for (String childGroupName : Constants.defaultRoleNames) {
+            roleName2ExternalId.put(
+                    childGroupName,
+                    addChildGroupToKeycloak(keycloak, parentGroupRepresentation.getId(), childGroupName, userExternalId)
+            );
         }
+
+        return roleName2ExternalId;
     }
 
     public void addUserToKeycloakGroup(String organizationName, String userExternalId) {
@@ -54,22 +64,24 @@ public class KeycloakController {
         }
     }
 
-    private GroupRepresentation addGroupToKeycloak(GroupRepresentation groupRepresentation, Keycloak keycloak) {
+    private void addGroupToKeycloak(GroupRepresentation groupRepresentation, Keycloak keycloak) {
         try (Response response = keycloak.realm(realm).groups().add(groupRepresentation)) {
             String groupId = CreatedResponseUtil.getCreatedId(response);
             groupRepresentation.setId(groupId);
-            return groupRepresentation;
         }
     }
 
-    private void addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, String userExternalId) {
+    private String addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, String userExternalId) {
         GroupRepresentation childGroup = new GroupRepresentation();
+        String childGroupId;
         childGroup.setName(childGroupName);
         try (Response response = keycloak.realm(realm).groups().group(parentGroupId).subGroup(childGroup)){
+            childGroupId = CreatedResponseUtil.getCreatedId(response);
             if (childGroup.getName().equals("Owner")) {
-                String childGroupId = CreatedResponseUtil.getCreatedId(response);
                 keycloak.realm(realm).users().get(userExternalId).joinGroup(childGroupId);
             }
         }
+
+        return childGroupId;
     }
 }

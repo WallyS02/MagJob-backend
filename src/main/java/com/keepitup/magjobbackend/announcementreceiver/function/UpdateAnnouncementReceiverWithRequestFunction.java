@@ -1,6 +1,5 @@
 package com.keepitup.magjobbackend.announcementreceiver.function;
 
-import com.keepitup.magjobbackend.announcement.dto.PatchAnnouncementRequest;
 import com.keepitup.magjobbackend.announcementreceiver.dto.PatchAnnouncementReceiverRequest;
 import com.keepitup.magjobbackend.announcementreceiver.entity.AnnouncementReceiver;
 import org.springframework.stereotype.Component;

@@ -83,6 +83,15 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
+    public Optional<List<Organization>> findAllOrganizationsByUserExternalId(String externalId) {
+        return userRepository.findByExternalId(externalId)
+                .map(memberRepository::findAllByUser)
+                .map(members -> members.stream()
+                        .map(Member::getOrganization)
+                        .collect(Collectors.toList()));
+    }
+
+    @Override
     public Optional<Member> findByUserAndOrganization(User user, Organization organization) {
         return memberRepository.findByUserAndOrganization(user, organization);
     }

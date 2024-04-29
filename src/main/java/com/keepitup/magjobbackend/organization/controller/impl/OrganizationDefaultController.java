@@ -78,8 +78,8 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizationsByUser(BigInteger id) {
-        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(id);
+    public GetOrganizationsResponse getOrganizationsByUser(String externalId) {
+        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUserExternalId(externalId);
 
         List<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

@@ -21,18 +21,18 @@ public interface OrganizationController {
     @ResponseBody
     GetOrganizationsResponse getOrganizations();
 
-    @Operation(summary = "Get Organizations By User")
-    @GetMapping("api/organizations/users/{userId}")
+    @Operation(summary = "Get Organizations By User External Id")
+    @GetMapping("api/organizations/users/{externalId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
             @Parameter(
-                    name = "id",
-                    description = "User id value",
+                    name = "externalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger id
+            @PathVariable("externalId")
+            String externalId
     );
 
     @Operation(summary = "Get Organization")

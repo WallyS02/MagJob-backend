@@ -24,6 +24,7 @@ public interface MemberService {
     Optional<List<User>> findAllUsersByOrganization(BigInteger organizationId);
 
     Optional<List<Organization>> findAllOrganizationsByUser(BigInteger userId);
+    Optional<List<Organization>> findAllOrganizationsByUserExternalId(String externalId);
 
     Optional<Member> findByUserAndOrganization(User user, Organization organization);
 

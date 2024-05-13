@@ -17,7 +17,7 @@ public class PostInvitationRequest {
     @Schema(description = "Organization id value")
     private BigInteger organization;
 
-    @Schema(description = "User id value")
-    private BigInteger user;
+    @Schema(description = "User external id value")
+    private String user;
 
 }

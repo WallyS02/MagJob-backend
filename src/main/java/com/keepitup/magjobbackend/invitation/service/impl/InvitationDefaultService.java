@@ -37,8 +37,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public Optional<List<Invitation>> findAllByUserAndIsActive(BigInteger userId, Boolean isActive) {
-        return userRepository.findById(userId)
+    public Optional<List<Invitation>> findAllByUserAndIsActive(String userExternalId, Boolean isActive) {
+        return userRepository.findByExternalId(userExternalId)
                 .map(user -> invitationRepository.findAllByUserAndIsActive(user, isActive));
     }
 
@@ -55,8 +55,13 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public Optional<Invitation> findByUserAndOrganization(BigInteger userId, BigInteger organizationId) {
-        return invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId);
+    public Optional<Invitation> findByUserAndOrganization(String userExternalId, BigInteger organizationId) {
+        return invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId);
+    }
+
+    @Override
+    public Optional<Invitation> findByUserExternalIdAndOrganization(String userExternalId, BigInteger organizationId) {
+        return invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId);
     }
 
     @Override
@@ -74,6 +79,11 @@ public class InvitationDefaultService implements InvitationService {
     @Override
     public void delete(BigInteger userId, BigInteger organizationId) {
         invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId).ifPresent(invitationRepository::delete);
+    }
+
+    @Override
+    public void delete(String userExternalId, BigInteger organizationId) {
+        invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId).ifPresent(invitationRepository::delete);
     }
 
     @Override

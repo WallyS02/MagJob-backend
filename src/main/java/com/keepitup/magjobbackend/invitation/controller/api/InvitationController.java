@@ -18,17 +18,17 @@ import java.math.BigInteger;
 public interface InvitationController {
 
     @Operation(summary = "Get Invitation")
-    @GetMapping("/api/invitations/{userId}/{organizationId}")
+    @GetMapping("/api/invitations/{userExternalId}/{organizationId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationResponse getInvitation(
             @Parameter(
-                    name = "userId",
-                    description = "User id value",
+                    name = "userExternalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger userId,
+            @PathVariable("userExternalId")
+            String userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",
@@ -39,17 +39,17 @@ public interface InvitationController {
     );
 
     @Operation(summary = "Get Invitation By User")
-    @GetMapping("/api/users/{userId}/invitations")
+    @GetMapping("/api/users/{userExternalId}/invitations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByUser(
             @Parameter(
-                    name = "userId",
-                    description = "User id value",
+                    name = "userExternalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger userId
+            @PathVariable("userExternalId")
+            String userId
     );
 
     @Operation(summary = "Get Invitations By Organization")
@@ -82,16 +82,16 @@ public interface InvitationController {
     );
 
     @Operation(summary = "Delete Invitation")
-    @DeleteMapping("/api/invitations/{userId}/{organizationId}")
+    @DeleteMapping("/api/invitations/{userExternalId}/{organizationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteInvitation(
             @Parameter(
-                    name = "userId",
-                    description = "User id value",
+                    name = "userExternalId",
+                    description = "User external id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger userId,
+            @PathVariable("userExternalId")
+            String userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

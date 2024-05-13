@@ -95,7 +95,7 @@ public class OrganizationDefaultController implements OrganizationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
             service.create(requestToOrganization.apply(postOrganizationRequest));
-            Optional<User> user = userService.find(postOrganizationRequest.getUser());
+            Optional<User> user = userService.findByExternalId(postOrganizationRequest.getUserExternalId());
             Optional<Organization> createdOrganization = service.findByName(postOrganizationRequest.getName());
 
             if (user.isPresent() && createdOrganization.isPresent()) {

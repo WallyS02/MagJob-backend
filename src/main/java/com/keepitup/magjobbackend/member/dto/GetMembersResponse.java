@@ -27,8 +27,8 @@ public class GetMembersResponse {
         @Schema(description = "Member id value")
         private BigInteger id;
 
-        @Schema(description = "User id value")
-        private BigInteger userId;
+        @Schema(description = "User external id value")
+        private String externalId;
 
         @Schema(description = "Member pseudonym value")
         private String pseudonym;

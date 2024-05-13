@@ -33,7 +33,7 @@ public class Invitation {
     private ZonedDateTime dateOfCreation;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_external_id")
     private User user;
 
     @ManyToOne

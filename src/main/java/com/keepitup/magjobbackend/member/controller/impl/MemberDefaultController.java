@@ -77,9 +77,9 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public GetMemberResponse createMember(PostMemberRequest postMemberRequest) {
-        Optional<List<Organization>> organizations = service.findAllOrganizationsByUser(postMemberRequest.getUser());
+        Optional<List<Organization>> organizations = service.findAllOrganizationsByUserExternalId(postMemberRequest.getExternalId());
         Optional<Organization>  organization = organizationService.find(postMemberRequest.getOrganization());
-        Optional<User> user = userService.find(postMemberRequest.getUser());
+        Optional<User> user = userService.findByExternalId(postMemberRequest.getExternalId());
 
         if (user.isEmpty() || organization.isEmpty() || organizations.isEmpty()
                 || organizations.get().contains(organization.get())

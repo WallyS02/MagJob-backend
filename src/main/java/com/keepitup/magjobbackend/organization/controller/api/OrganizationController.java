@@ -1,7 +1,6 @@
 package com.keepitup.magjobbackend.organization.controller.api;
 
 import com.keepitup.magjobbackend.organization.dto.*;
-import com.keepitup.magjobbackend.user.dto.PutPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 @RestController
@@ -110,15 +109,4 @@ public class UserDefaultController implements UserController {
                 );
         return getUser(externalId);
     }
-
-    public void updateUserPassword(BigInteger id, PutPasswordRequest putPasswordRequest) {
-        service.find(id)
-                .ifPresentOrElse(
-                        user -> service.update(updateUserPasswordWithRequestFunction.apply(user, putPasswordRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
-    }
-
 }

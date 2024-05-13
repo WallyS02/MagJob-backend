@@ -3,7 +3,6 @@ package com.keepitup.magjobbackend.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.util.List;
 @Getter
 @Setter
@@ -24,8 +23,8 @@ public class GetUsersResponse {
     @EqualsAndHashCode
     public static class User {
 
-        @Schema(description = "User id value")
-        private BigInteger id;
+        @Schema(description = "User external id value")
+        private String externalId;
 
         @Schema(description = "User email value")
         private String email;

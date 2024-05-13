@@ -62,15 +62,15 @@ public class InvitationDefaultController implements InvitationController {
 
 
     @Override
-    public GetInvitationResponse getInvitation(BigInteger userId, BigInteger organizationId) {
-        return service.findByUserAndOrganization(userId, organizationId)
+    public GetInvitationResponse getInvitation(String userExternalId, BigInteger organizationId) {
+        return service.findByUserExternalIdAndOrganization(userExternalId, organizationId)
                 .map(invitationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByUser(BigInteger userId) {
-        return service.findAllByUserAndIsActive(userId, true)
+    public GetInvitationsResponse getInvitationsByUser(String userExternalId) {
+        return service.findAllByUserAndIsActive(userExternalId, true)
                 .map(invitationsToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
@@ -103,10 +103,10 @@ public class InvitationDefaultController implements InvitationController {
     }
 
     @Override
-    public void deleteInvitation(BigInteger userId, BigInteger organizationId) {
-        service.findByUserAndOrganization(userId, organizationId)
+    public void deleteInvitation(String userExternalId, BigInteger organizationId) {
+        service.findByUserAndOrganization(userExternalId, organizationId)
                 .ifPresentOrElse(
-                        invitation -> service.delete(userId, organizationId),
+                        invitation -> service.delete(userExternalId, organizationId),
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }

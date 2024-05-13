@@ -23,8 +23,8 @@ public class GetMemberResponse {
     @EqualsAndHashCode
     public static class User {
 
-        @Schema(description = "User id  value")
-        private BigInteger id;
+        @Schema(description = "User external id  value")
+        private String externalId;
 
         @Schema(description = "User email  value")
         private String email;

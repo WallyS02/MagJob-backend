@@ -17,8 +17,8 @@ public class AcceptInvitationRequest {
     @Schema(description = "Organization id value")
     private BigInteger organization;
 
-    @Schema(description = "User id value")
-    private BigInteger user;
+    @Schema(description = "User external id value")
+    private String user;
 
     @Schema(description = "Member pseudonym value")
     private String pseudonym;

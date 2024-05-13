@@ -16,7 +16,7 @@ public class RequestToMemberFunction implements Function<PostMemberRequest, Memb
         return Member.builder()
                 .pseudonym(request.getPseudonym())
                 .user(User.builder()
-                        .id(request.getUser())
+                        .externalId(request.getExternalId())
                         .build())
                 .organization(Organization.builder()
                         .id(request.getOrganization())

@@ -15,7 +15,7 @@ public class UsersToResponseFunction implements Function<List<User>, GetUsersRes
         return GetUsersResponse.builder()
                 .users(users.stream()
                         .map(user -> GetUsersResponse.User.builder()
-                                .id(user.getId())
+                                .externalId(user.getExternalId())
                                 .email(user.getEmail())
                                 .build())
                         .toList()).

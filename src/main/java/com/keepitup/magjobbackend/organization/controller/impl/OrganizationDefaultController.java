@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @Log
@@ -78,8 +79,8 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizationsByUser(String externalId) {
-        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUserExternalId(externalId);
+    public GetOrganizationsResponse getOrganizationsByUser(UUID userId) {
+        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUserId(userId);
 
         List<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -95,12 +96,12 @@ public class OrganizationDefaultController implements OrganizationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
             service.create(requestToOrganization.apply(postOrganizationRequest));
-            Optional<User> user = userService.findByExternalId(postOrganizationRequest.getUserExternalId());
+            Optional<User> user = userService.find(postOrganizationRequest.getUserId());
             Optional<Organization> createdOrganization = service.findByName(postOrganizationRequest.getName());
 
             if (user.isPresent() && createdOrganization.isPresent()) {
                 roleName2groupExternalId =
-                        keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getExternalId());
+                        keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getId());
 
                 for (String roleName : Constants.DEFAULT_ROLE_NAMES) {
                     roleService.create(Role.builder()

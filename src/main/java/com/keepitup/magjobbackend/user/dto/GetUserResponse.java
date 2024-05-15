@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -15,8 +17,8 @@ import java.time.LocalDate;
 @Schema(description = "GetUserResponse DTO")
 public class GetUserResponse {
 
-    @Schema(description = "User external Id value")
-    private String externalId;
+    @Schema(description = "User id value")
+    private UUID id;
 
     @Schema(description = "User email value")
     private String email;

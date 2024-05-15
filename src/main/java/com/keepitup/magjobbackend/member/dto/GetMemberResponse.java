@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -23,8 +25,8 @@ public class GetMemberResponse {
     @EqualsAndHashCode
     public static class User {
 
-        @Schema(description = "User external id  value")
-        private String externalId;
+        @Schema(description = "User id  value")
+        private UUID id;
 
         @Schema(description = "User email  value")
         private String email;

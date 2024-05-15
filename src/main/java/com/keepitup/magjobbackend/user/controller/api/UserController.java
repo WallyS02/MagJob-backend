@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name = "User Controller")
 public interface UserController {
@@ -24,17 +25,17 @@ public interface UserController {
     GetUsersResponse getUsers();
 
     @Operation(summary = "Get User")
-    @GetMapping("/api/users/{externalId}")
+    @GetMapping("/api/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetUserResponse getUser(
             @Parameter(
-                    name = "external id",
-                    description = "User external id value",
+                    name = "id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("externalId")
-            String externalId
+            @PathVariable("id")
+            UUID id
     );
 
     @Operation(summary = "Create User")
@@ -44,30 +45,30 @@ public interface UserController {
     GetUserResponse createUser();
 
     @Operation(summary = "Delete User")
-    @DeleteMapping("/api/users/{externalId}")
+    @DeleteMapping("/api/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUser(
             @Parameter(
-                    name = "externalId",
-                    description = "User external id value",
+                    name = "id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("externalId")
-            String externalId
+            @PathVariable("id")
+            UUID id
     );
 
     @Operation(summary = "Update User")
-    @PatchMapping("/api/users/{externalId}")
+    @PatchMapping("/api/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetUserResponse updateUser(
             @Parameter(
-                    name = "externalId",
-                    description = "User external id value",
+                    name = "id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("externalId")
-            String externalId,
+            @PathVariable("id")
+            UUID id,
             @Parameter(
                     name = "PatchUserRequest",
                     description = "PatchUserRequest DTO",

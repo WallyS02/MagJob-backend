@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -17,7 +19,7 @@ public class PostInvitationRequest {
     @Schema(description = "Organization id value")
     private BigInteger organization;
 
-    @Schema(description = "User external id value")
-    private String user;
+    @Schema(description = "User id value")
+    private UUID userId;
 
 }

@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class InvitationDefaultService implements InvitationService {
@@ -31,14 +32,14 @@ public class InvitationDefaultService implements InvitationService {
 
 
     @Override
-    public Optional<List<Invitation>> findAllByUser(BigInteger userId) {
+    public Optional<List<Invitation>> findAllByUser(UUID userId) {
         return userRepository.findById(userId)
                 .map(invitationRepository::findAllByUser);
     }
 
     @Override
-    public Optional<List<Invitation>> findAllByUserAndIsActive(String userExternalId, Boolean isActive) {
-        return userRepository.findByExternalId(userExternalId)
+    public Optional<List<Invitation>> findAllByUserAndIsActive(UUID userId, Boolean isActive) {
+        return userRepository.findById(userId)
                 .map(user -> invitationRepository.findAllByUserAndIsActive(user, isActive));
     }
 
@@ -55,13 +56,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public Optional<Invitation> findByUserAndOrganization(String userExternalId, BigInteger organizationId) {
-        return invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId);
-    }
-
-    @Override
-    public Optional<Invitation> findByUserExternalIdAndOrganization(String userExternalId, BigInteger organizationId) {
-        return invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId);
+    public Optional<Invitation> findByUserAndOrganization(UUID userId, BigInteger organizationId) {
+        return invitationRepository.findByUserIdAndOrganizationId(userId, organizationId);
     }
 
     @Override
@@ -77,13 +73,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public void delete(BigInteger userId, BigInteger organizationId) {
-        invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId).ifPresent(invitationRepository::delete);
-    }
-
-    @Override
-    public void delete(String userExternalId, BigInteger organizationId) {
-        invitationRepository.findByUser_ExternalIdAndOrganization_Id(userExternalId, organizationId).ifPresent(invitationRepository::delete);
+    public void delete(UUID userId, BigInteger organizationId) {
+        invitationRepository.findByUserIdAndOrganizationId(userId, organizationId).ifPresent(invitationRepository::delete);
     }
 
     @Override

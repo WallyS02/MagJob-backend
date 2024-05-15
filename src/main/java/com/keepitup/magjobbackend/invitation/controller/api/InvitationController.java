@@ -13,22 +13,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name = "Invitation Controller")
 public interface InvitationController {
 
     @Operation(summary = "Get Invitation")
-    @GetMapping("/api/invitations/{userExternalId}/{organizationId}")
+    @GetMapping("/api/invitations/{userId}/{organizationId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationResponse getInvitation(
             @Parameter(
-                    name = "userExternalId",
-                    description = "User external id value",
+                    name = "user id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("userExternalId")
-            String userId,
+            @PathVariable("userId")
+            UUID userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",
@@ -39,17 +40,17 @@ public interface InvitationController {
     );
 
     @Operation(summary = "Get Invitation By User")
-    @GetMapping("/api/users/{userExternalId}/invitations")
+    @GetMapping("/api/users/{userId}/invitations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByUser(
             @Parameter(
-                    name = "userExternalId",
-                    description = "User external id value",
+                    name = "user id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("userExternalId")
-            String userId
+            @PathVariable("userId")
+            UUID userId
     );
 
     @Operation(summary = "Get Invitations By Organization")
@@ -82,16 +83,16 @@ public interface InvitationController {
     );
 
     @Operation(summary = "Delete Invitation")
-    @DeleteMapping("/api/invitations/{userExternalId}/{organizationId}")
+    @DeleteMapping("/api/invitations/{userId}/{organizationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteInvitation(
             @Parameter(
-                    name = "userExternalId",
-                    description = "User external id value",
+                    name = "user id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("userExternalId")
-            String userId,
+            @PathVariable("userId")
+            UUID userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

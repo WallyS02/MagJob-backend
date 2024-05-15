@@ -15,7 +15,7 @@ public class MemberToResponseFunction implements Function<Member, GetMemberRespo
                 .pseudonym(member.getPseudonym())
                 .isStillMember(member.getIsStillMember())
                 .user(GetMemberResponse.User.builder()
-                        .externalId(member.getUser().getExternalId())
+                        .id(member.getUser().getId())
                         .email(member.getUser().getEmail())
                         .build())
                 .organization(GetMemberResponse.Organization.builder()

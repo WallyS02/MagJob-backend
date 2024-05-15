@@ -10,6 +10,7 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class KeycloakController {
@@ -23,7 +24,7 @@ public class KeycloakController {
     }
 
 
-    public Map<String, String> createGroupRepresentation(String organizationName, String userExternalId) {
+    public Map<String, String> createGroupRepresentation(String organizationName, UUID userId) {
         GroupRepresentation parentGroupRepresentation = new GroupRepresentation();
         Map<String, String> roleName2ExternalId = new HashMap<>();
 
@@ -36,29 +37,29 @@ public class KeycloakController {
         for (String childGroupName : Constants.DEFAULT_ROLE_NAMES) {
             roleName2ExternalId.put(
                     childGroupName,
-                    addChildGroupToKeycloak(keycloak, parentGroupRepresentation.getId(), childGroupName, userExternalId)
+                    addChildGroupToKeycloak(keycloak, parentGroupRepresentation.getId(), childGroupName, userId)
             );
         }
 
         return roleName2ExternalId;
     }
 
-    public void addUserToKeycloakGroup(String organizationName, String userExternalId) {
+    public void addUserToKeycloakGroup(String organizationName, UUID userId) {
         Keycloak keycloak = keycloakUtil.getKeycloakInstance();
         GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + Constants.ROLE_NAME_MEMBER);
         try {
-            keycloak.realm(realm).users().get(userExternalId).joinGroup(groupRepresentation.getId());
+            keycloak.realm(realm).users().get(String.valueOf(userId)).joinGroup(groupRepresentation.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //TODO Modify method to remove from all subgroups in Keycloak
-    public void removeUserFromKeycloakGroup(String organizationName, String userExternalId) {
+    public void removeUserFromKeycloakGroup(String organizationName, UUID userId) {
         Keycloak keycloak = keycloakUtil.getKeycloakInstance();
         GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + Constants.ROLE_NAME_MEMBER);
         try {
-            keycloak.realm(realm).users().get(userExternalId).leaveGroup(groupRepresentation.getId());
+            keycloak.realm(realm).users().get(String.valueOf(userId)).leaveGroup(groupRepresentation.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,14 +72,14 @@ public class KeycloakController {
         }
     }
 
-    private String addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, String userExternalId) {
+    private String addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, UUID userId) {
         GroupRepresentation childGroup = new GroupRepresentation();
         String childGroupId;
         childGroup.setName(childGroupName);
         try (Response response = keycloak.realm(realm).groups().group(parentGroupId).subGroup(childGroup)){
             childGroupId = CreatedResponseUtil.getCreatedId(response);
             if (childGroup.getName().equals(Constants.ROLE_NAME_OWNER)) {
-                keycloak.realm(realm).users().get(userExternalId).joinGroup(childGroupId);
+                keycloak.realm(realm).users().get(String.valueOf(userId)).joinGroup(childGroupId);
             }
         }
 

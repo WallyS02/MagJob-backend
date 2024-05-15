@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name="Organization Controller")
 public interface OrganizationController {
@@ -20,18 +21,18 @@ public interface OrganizationController {
     @ResponseBody
     GetOrganizationsResponse getOrganizations();
 
-    @Operation(summary = "Get Organizations By User External Id")
-    @GetMapping("api/organizations/users/{externalId}")
+    @Operation(summary = "Get Organizations By User id")
+    @GetMapping("api/organizations/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
             @Parameter(
-                    name = "externalId",
-                    description = "User external id value",
+                    name = "user id",
+                    description = "User id value",
                     required = true
             )
-            @PathVariable("externalId")
-            String externalId
+            @PathVariable("id")
+            UUID id
     );
 
     @Operation(summary = "Get Organization")

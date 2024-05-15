@@ -12,7 +12,7 @@ public class UserToResponseFunction implements Function<User, GetUserResponse> {
     @Override
     public GetUserResponse apply(User user) {
         return GetUserResponse.builder()
-                .externalId(user.getExternalId())
+                .id(user.getId())
                 .email(user.getEmail())
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())

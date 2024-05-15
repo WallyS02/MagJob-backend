@@ -40,7 +40,7 @@ public class Member {
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
   

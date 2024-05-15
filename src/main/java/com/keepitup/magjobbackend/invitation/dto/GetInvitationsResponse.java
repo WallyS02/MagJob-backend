@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -26,7 +28,7 @@ public class GetInvitationsResponse {
     public static class Invitation {
 
         @Schema(description = "User id value")
-        private BigInteger userId;
+        private UUID userId;
 
         @Schema(description = "Organization id value")
         private BigInteger organizationId;

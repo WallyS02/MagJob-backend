@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @Log
@@ -62,15 +63,15 @@ public class InvitationDefaultController implements InvitationController {
 
 
     @Override
-    public GetInvitationResponse getInvitation(String userExternalId, BigInteger organizationId) {
-        return service.findByUserExternalIdAndOrganization(userExternalId, organizationId)
+    public GetInvitationResponse getInvitation(UUID userId, BigInteger organizationId) {
+        return service.findByUserAndOrganization(userId, organizationId)
                 .map(invitationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByUser(String userExternalId) {
-        return service.findAllByUserAndIsActive(userExternalId, true)
+    public GetInvitationsResponse getInvitationsByUser(UUID userId) {
+        return service.findAllByUserAndIsActive(userId, true)
                 .map(invitationsToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
@@ -84,12 +85,12 @@ public class InvitationDefaultController implements InvitationController {
 
     @Override
     public GetInvitationResponse sendInvitation(PostInvitationRequest request) {
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
         if (invitation.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
         else {
-            if (memberService.findByUserAndOrganization(userService.find(request.getUser()).get(),
+            if (memberService.findByUserAndOrganization(userService.find(request.getUserId()).get(),
                     organizationService.find(request.getOrganization()).get()).isPresent()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             } else {
@@ -97,16 +98,16 @@ public class InvitationDefaultController implements InvitationController {
             }
         }
 
-        return service.findByUserAndOrganization(request.getUser(), request.getOrganization())
+        return service.findByUserAndOrganization(request.getUserId(), request.getOrganization())
                 .map(invitationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public void deleteInvitation(String userExternalId, BigInteger organizationId) {
-        service.findByUserAndOrganization(userExternalId, organizationId)
+    public void deleteInvitation(UUID userId, BigInteger organizationId) {
+        service.findByUserAndOrganization(userId, organizationId)
                 .ifPresentOrElse(
-                        invitation -> service.delete(userExternalId, organizationId),
+                        invitation -> service.delete(userId, organizationId),
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }
@@ -115,8 +116,8 @@ public class InvitationDefaultController implements InvitationController {
 
     @Override
     public GetMemberResponse acceptInvitation(AcceptInvitationRequest request) {
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
-        Optional<User> user = userService.find(request.getUser());
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
+        Optional<User> user = userService.find(request.getUserId());
         Optional<Organization> organization = organizationService.find(request.getOrganization());
 
         if (invitation.isPresent()) {
@@ -143,9 +144,9 @@ public class InvitationDefaultController implements InvitationController {
     @Override
     public void rejectInvitation(PostInvitationRequest request) {
 
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
         if (invitation.isPresent()) {
-            service.delete(request.getUser(), request.getOrganization());
+            service.delete(request.getUserId(), request.getOrganization());
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

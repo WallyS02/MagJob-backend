@@ -8,6 +8,7 @@ import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MemberService {
     List<Member> findAllByIsStillMember(Boolean isStillMember);
@@ -23,8 +24,8 @@ public interface MemberService {
 
     Optional<List<User>> findAllUsersByOrganization(BigInteger organizationId);
 
-    Optional<List<Organization>> findAllOrganizationsByUser(BigInteger userId);
-    Optional<List<Organization>> findAllOrganizationsByUserExternalId(String externalId);
+    Optional<List<Organization>> findAllOrganizationsByUser(UUID userId);
+    Optional<List<Organization>> findAllOrganizationsByUserId(UUID userId);
 
     Optional<Member> findByUserAndOrganization(User user, Organization organization);
 

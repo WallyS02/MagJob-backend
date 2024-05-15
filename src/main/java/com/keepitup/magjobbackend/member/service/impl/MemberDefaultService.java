@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,7 +75,7 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public Optional<List<Organization>> findAllOrganizationsByUser(BigInteger userId) {
+    public Optional<List<Organization>> findAllOrganizationsByUser(UUID userId) {
         return userRepository.findById(userId)
                 .map(memberRepository::findAllByUser)
                 .map(members -> members.stream()
@@ -83,8 +84,8 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public Optional<List<Organization>> findAllOrganizationsByUserExternalId(String externalId) {
-        return userRepository.findByExternalId(externalId)
+    public Optional<List<Organization>> findAllOrganizationsByUserId(UUID userId) {
+        return userRepository.findById(userId)
                 .map(memberRepository::findAllByUser)
                 .map(members -> members.stream()
                         .map(Member::getOrganization)

@@ -15,7 +15,7 @@ public class RequestToUserFunction implements Function<PostUserRequest, User> {
                 .email(request.getEmail())
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
-                .externalId(request.getExternalId())
+                .id(request.getId())
                 .build();
     }
 }

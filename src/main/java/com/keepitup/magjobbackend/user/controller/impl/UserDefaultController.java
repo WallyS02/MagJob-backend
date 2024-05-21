@@ -48,9 +48,6 @@ public class UserDefaultController implements UserController {
 
     @Override
     public GetUsersResponse getUsers() {
-        if (!securityService.hasAdminPermission()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
         return usersToResponse.apply(service.findAll());
     }
 

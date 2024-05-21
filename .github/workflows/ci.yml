@@ -59,9 +59,10 @@ jobs:
       - name: Build with Maven
         run: mvn verify
       - name: Build and push Docker Image
-        uses: mr-smithers-excellent/docker-build-push@v4
+        uses: mr-smithers-excellent/docker-build-push@v6
         with:
-            image: keepitup2023/magjob-backend:latest
+            image: keepitup2023/magjob-backend
+            tags: latest
             registry: docker.io
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}

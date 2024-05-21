@@ -65,7 +65,7 @@ public interface RoleController {
     );
 
     @Operation(summary = "Update Role")
-    @PostMapping("api/roles/{id}")
+    @PatchMapping("api/roles/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetRoleResponse updateRole(

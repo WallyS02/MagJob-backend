@@ -15,6 +15,10 @@ public class UpdateRoleWithRequestFunction implements BiFunction<Role, PatchRole
                 .externalId(role.getExternalId())
                 .name(request.getName())
                 .organization(role.getOrganization())
+                .canManageTasks(request.getCanManageTasks())
+                .canManageRoles(request.getCanManageRoles())
+                .canManageInvitations(request.getCanManageInvitations())
+                .canManageAnnouncements(request.getCanManageAnnouncements())
                 .build();
     }
 }

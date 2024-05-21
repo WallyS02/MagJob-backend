@@ -38,4 +38,19 @@ public class Role {
 
     @OneToMany(mappedBy = "role")
     private List<RoleMember> roleMembers;
+
+    @Column(name = "canManageTasks")
+    private Boolean canManageTasks;
+
+    @Column(name = "canManageAnnouncements")
+    private Boolean canManageAnnouncements;
+
+    @Column(name = "canManageInvitations")
+    private Boolean canManageInvitations;
+
+    @Column(name = "canManageRoles")
+    private Boolean canManageRoles;
+
+    @Column(name = "isAdmin")
+    private Boolean isAdmin;
 }

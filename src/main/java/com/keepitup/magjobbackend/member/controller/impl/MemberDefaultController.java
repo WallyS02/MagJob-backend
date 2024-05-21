@@ -1,6 +1,7 @@
 package com.keepitup.magjobbackend.member.controller.impl;
 
 import com.keepitup.magjobbackend.configuration.KeycloakController;
+import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
 import com.keepitup.magjobbackend.member.dto.*;
 import com.keepitup.magjobbackend.member.entity.Member;
@@ -31,6 +32,7 @@ public class MemberDefaultController implements MemberController {
     private final RequestToMemberFunction requestToMember;
     private final UpdateMemberWithRequestFunction updateMemberWithRequest;
     private final KeycloakController keycloakController;
+    private final SecurityService securityService;
 
     @Autowired
     public MemberDefaultController(
@@ -41,7 +43,8 @@ public class MemberDefaultController implements MemberController {
             MemberToResponseFunction memberToResponse,
             RequestToMemberFunction requestToMember,
             UpdateMemberWithRequestFunction updateMemberWithRequest,
-            KeycloakController keycloakController
+            KeycloakController keycloakController,
+            SecurityService securityService
     ) {
         this.service = service;
         this.userService = userService;
@@ -51,10 +54,15 @@ public class MemberDefaultController implements MemberController {
         this.requestToMember = requestToMember;
         this.updateMemberWithRequest = updateMemberWithRequest;
         this.keycloakController = keycloakController;
+        this.securityService = securityService;
     }
 
     @Override
     public GetMembersResponse getMembers() {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return membersToResponse.apply(service.findAllByIsStillMember(true));
     }
 
@@ -65,11 +73,19 @@ public class MemberDefaultController implements MemberController {
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true));
     }
 
     @Override
     public GetMemberResponse getMember(BigInteger id) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return service.findByIdAndIsStillMember(id, true)
                 .map(memberToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -81,11 +97,17 @@ public class MemberDefaultController implements MemberController {
         Optional<Organization>  organization = organizationService.find(postMemberRequest.getOrganization());
         Optional<User> user = userService.find(postMemberRequest.getUserId());
 
+
         if (user.isEmpty() || organization.isEmpty() || organizations.isEmpty()
                 || organizations.get().contains(organization.get())
         ) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
+
+            if (!securityService.isOwner(organization.get())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+
             service.create(requestToMember.apply(postMemberRequest));
 
             keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getId());
@@ -97,30 +119,34 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public void deleteMember(BigInteger id) {
-        Optional<Member> memberToDelete = service.findByIdAndIsStillMember(id, true);
-        memberToDelete.ifPresent(member -> keycloakController.removeUserFromKeycloakGroup(
-                member.getOrganization().getName(),
-                member.getUser().getId()
-        ));
+        Member memberToDelete = service.findByIdAndIsStillMember(id, true).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
 
-        memberToDelete
-                .ifPresentOrElse(
-                        member -> service.delete(id),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        if (!securityService.isOwner(memberToDelete.getOrganization())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        keycloakController.removeUserFromKeycloakGroup(
+                memberToDelete.getOrganization().getName(),
+                memberToDelete.getUser().getId()
+        );
+
+        service.delete(id);
     }
 
     @Override
     public GetMemberResponse updateMember(BigInteger id, PatchMemberRequest patchMemberRequest) {
-        service.findByIdAndIsStillMember(id, true)
-                .ifPresentOrElse(
-                        member -> service.update(updateMemberWithRequest.apply(member, patchMemberRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Member member = service.findByIdAndIsStillMember(id, true).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        if (!securityService.isOwner(member.getOrganization())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.update(updateMemberWithRequest.apply(member, patchMemberRequest));
+
         return getMember(id);
     }
 }

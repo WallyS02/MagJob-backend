@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.user.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.user.controller.api.UserController;
 import com.keepitup.magjobbackend.user.dto.*;
@@ -25,6 +26,7 @@ public class UserDefaultController implements UserController {
     private final UsersToResponseFunction usersToResponse;
     private final RequestToUserFunction requestToUser;
     private final UpdateUserWithRequestFunction updateUserWithRequest;
+    private final SecurityService securityService;
 
     @Autowired
     public UserDefaultController(
@@ -33,16 +35,22 @@ public class UserDefaultController implements UserController {
             UsersToResponseFunction usersToResponse,
             RequestToUserFunction requestToUser,
             UpdateUserWithRequestFunction updateUserWithRequest,
-            UpdateUserPasswordWithRequestFunction updateUserPasswordWithRequestFunction) {
+            UpdateUserPasswordWithRequestFunction updateUserPasswordWithRequestFunction,
+            SecurityService securityService
+    ) {
         this.service = service;
         this.userToResponse = userToResponse;
         this.usersToResponse = usersToResponse;
         this.requestToUser = requestToUser;
         this.updateUserWithRequest = updateUserWithRequest;
+        this.securityService = securityService;
     }
 
     @Override
     public GetUsersResponse getUsers() {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return usersToResponse.apply(service.findAll());
     }
 
@@ -88,6 +96,10 @@ public class UserDefaultController implements UserController {
 
     @Override
     public void deleteUser(UUID id) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         service.find(id)
                 .ifPresentOrElse(
                         user -> service.delete(id),
@@ -99,6 +111,13 @@ public class UserDefaultController implements UserController {
 
     @Override
     public GetUserResponse updateUser(UUID id, PatchUserRequest patchUserRequest) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
+        }
+
         service.find(id)
                 .ifPresentOrElse(
                     user -> service.update(updateUserWithRequest.apply(user, patchUserRequest)),

@@ -3,27 +3,30 @@ package com.keepitup.magjobbackend.member.service.api;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import javax.swing.text.html.Option;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberService {
-    List<Member> findAllByIsStillMember(Boolean isStillMember);
+    Page<Member> findAllByIsStillMember(Boolean isStillMember, Pageable pageable);
+
     Optional<Member> find(BigInteger id);
 
     Optional<Member> findByIdAndIsStillMember(BigInteger id, Boolean isStillMember);
 
-    List<Member> findAllByPseudonym(String pseudonym);
-    List<Member> findAllByOrganization(Organization organization);
-    List<Member> findAllByOrganizationAndIsStillMember(Organization organization, Boolean isStillMember);
+    Page<Member> findAllByPseudonym(String pseudonym, Pageable pageable);
+
+    Page<Member> findAllByOrganization(Organization organization, Pageable pageable);
+
+    Page<Member> findAllByOrganizationAndIsStillMember(Organization organization, Boolean isStillMember, Pageable pageable);
 
     Boolean checkIfStillMember(BigInteger id);
 
-    Optional<List<User>> findAllUsersByOrganization(BigInteger organizationId);
+    Optional<Page<User>> findAllUsersByOrganization(BigInteger organizationId, Pageable pageable);
 
-    Optional<List<Organization>> findAllOrganizationsByUser(BigInteger userId);
+    Optional<Page<Organization>> findAllOrganizationsByUser(BigInteger userId, Pageable pageable);
 
     Optional<Member> findByUserAndOrganization(User user, Organization organization);
 

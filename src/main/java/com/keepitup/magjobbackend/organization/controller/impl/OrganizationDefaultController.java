@@ -11,12 +11,13 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -51,8 +52,9 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizations() {
-        return organizationsToResponse.apply(service.findAll());
+    public GetOrganizationsResponse getOrganizations(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return organizationsToResponse.apply(service.findAll(pageRequest));
     }
 
     @Override
@@ -63,10 +65,11 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizationsByUser(BigInteger id) {
-        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(id);
+    public GetOrganizationsResponse getOrganizationsByUser(int page, int size, BigInteger id) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Optional<Page<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(id, pageRequest);
 
-        List<Organization> organizations = organizationsOptional
+        Page<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return organizationsToResponse.apply(organizations);

@@ -2,7 +2,6 @@ package com.keepitup.magjobbackend.member.controller.impl;
 
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
 import com.keepitup.magjobbackend.member.dto.*;
-import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.function.*;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
@@ -11,12 +10,14 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -50,18 +51,20 @@ public class MemberDefaultController implements MemberController {
     }
 
     @Override
-    public GetMembersResponse getMembers() {
-        return membersToResponse.apply(service.findAllByIsStillMember(true));
+    public GetMembersResponse getMembers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return membersToResponse.apply(service.findAllByIsStillMember(true, pageRequest));
     }
 
     @Override
-    public GetMembersResponse getMembersByOrganization(BigInteger organizationId) {
+    public GetMembersResponse getMembersByOrganization(int page, int size, BigInteger organizationId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true));
+        return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true, pageRequest));
     }
 
     @Override
@@ -73,12 +76,12 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public GetMemberResponse createMember(PostMemberRequest postMemberRequest) {
-        Optional<List<Organization>> organizations = service.findAllOrganizationsByUser(postMemberRequest.getUser());
+        Optional<Page<Organization>> organizations = service.findAllOrganizationsByUser(postMemberRequest.getUser(), Pageable.unpaged());
         Optional<Organization>  organization = organizationService.find(postMemberRequest.getOrganization());
         Optional<User> user = userService.find(postMemberRequest.getUser());
 
         if (user.isEmpty() || organization.isEmpty() || organizations.isEmpty()
-                || organizations.get().contains(organization.get())
+                || organizations.get().stream().toList().contains(organization.get())
         ) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {

@@ -1,7 +1,7 @@
 package com.keepitup.magjobbackend.organization.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.organization.dto.*;
-import com.keepitup.magjobbackend.user.dto.PutPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,19 +13,44 @@ import java.math.BigInteger;
 
 @Tag(name="Organization Controller")
 public interface OrganizationController {
-
+    PageConfig pageConfig = new PageConfig();
 
     @Operation(summary = "Get all Organizations")
     @GetMapping("api/organizations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetOrganizationsResponse getOrganizations();
+    GetOrganizationsResponse getOrganizations(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Organizations By User")
     @GetMapping("api/organizations/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "id",
                     description = "User id value",

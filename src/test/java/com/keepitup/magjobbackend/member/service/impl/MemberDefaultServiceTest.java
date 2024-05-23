@@ -10,10 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,11 +44,11 @@ class MemberDefaultServiceTest {
     void testFindAllByIsStillMember() {
         // Arrange
         Boolean isStillMember = true;
-        List<Member> expectedMembers = new ArrayList<>();
-        when(memberRepository.findAllByIsStillMember(isStillMember)).thenReturn(expectedMembers);
+        Page<Member> expectedMembers = new PageImpl<>(new ArrayList<>());
+        when(memberRepository.findAllByIsStillMember(isStillMember, Pageable.unpaged())).thenReturn(expectedMembers);
 
         // Act
-        List<Member> result = memberService.findAllByIsStillMember(isStillMember);
+        Page<Member> result = memberService.findAllByIsStillMember(isStillMember, Pageable.unpaged());
 
         // Assert
         assertSame(expectedMembers, result);
@@ -87,11 +89,11 @@ class MemberDefaultServiceTest {
     void testFindAllByPseudonym() {
         // Arrange
         String pseudonym = "john_doe";
-        List<Member> expectedMembers = new ArrayList<>();
-        when(memberRepository.findAllByPseudonym(pseudonym)).thenReturn(expectedMembers);
+        Page<Member> expectedMembers = new PageImpl<>(new ArrayList<>());
+        when(memberRepository.findAllByPseudonym(pseudonym, Pageable.unpaged())).thenReturn(expectedMembers);
 
         // Act
-        List<Member> result = memberService.findAllByPseudonym(pseudonym);
+        Page<Member> result = memberService.findAllByPseudonym(pseudonym, Pageable.unpaged());
 
         // Assert
         assertSame(expectedMembers, result);
@@ -101,11 +103,11 @@ class MemberDefaultServiceTest {
     void testFindAllByOrganization() {
         // Arrange
         Organization organization = new Organization();
-        List<Member> expectedMembers = new ArrayList<>();
-        when(memberRepository.findAllByOrganization(organization)).thenReturn(expectedMembers);
+        Page<Member> expectedMembers = new PageImpl<>(new ArrayList<>());
+        when(memberRepository.findAllByOrganization(organization, Pageable.unpaged())).thenReturn(expectedMembers);
 
         // Act
-        List<Member> result = memberService.findAllByOrganization(organization);
+        Page<Member> result = memberService.findAllByOrganization(organization, Pageable.unpaged());
 
         // Assert
         assertSame(expectedMembers, result);
@@ -116,11 +118,11 @@ class MemberDefaultServiceTest {
         // Arrange
         Organization organization = new Organization();
         Boolean isStillMember = true;
-        List<Member> expectedMembers = new ArrayList<>();
-        when(memberRepository.findAllByOrganizationAndIsStillMember(organization, isStillMember)).thenReturn(expectedMembers);
+        Page<Member> expectedMembers = new PageImpl<>(new ArrayList<>());
+        when(memberRepository.findAllByOrganizationAndIsStillMember(organization, isStillMember, Pageable.unpaged())).thenReturn(expectedMembers);
 
         // Act
-        List<Member> result = memberService.findAllByOrganizationAndIsStillMember(organization, isStillMember);
+        Page<Member> result = memberService.findAllByOrganizationAndIsStillMember(organization, isStillMember, Pageable.unpaged());
 
         // Assert
         assertSame(expectedMembers, result);
@@ -146,16 +148,16 @@ class MemberDefaultServiceTest {
         // Arrange
         BigInteger organizationId = BigInteger.ONE;
         Organization organization = new Organization();
-        List<Member> members = new ArrayList<>();
+        Page<Member> members = new PageImpl<>(new ArrayList<>());
         when(organizationRepository.findById(organizationId)).thenReturn(Optional.of(organization));
-        when(memberRepository.findAllByOrganization(organization)).thenReturn(members);
+        when(memberRepository.findAllByOrganization(organization, Pageable.unpaged())).thenReturn(members);
 
         // Act
-        Optional<List<User>> result = memberService.findAllUsersByOrganization(organizationId);
+        Optional<Page<User>> result = memberService.findAllUsersByOrganization(organizationId, Pageable.unpaged());
 
         // Assert
         assertTrue(result.isPresent());
-        assertEquals(members.size(), result.get().size());
+        assertEquals(members.getTotalElements(), result.get().getTotalElements());
     }
 
     @Test
@@ -163,16 +165,16 @@ class MemberDefaultServiceTest {
         // Arrange
         BigInteger userId = BigInteger.ONE;
         User user = new User();
-        List<Member> members = new ArrayList<>();
+        Page<Member> members = new PageImpl<>(new ArrayList<>());
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(memberRepository.findAllByUser(user)).thenReturn(members);
+        when(memberRepository.findAllByUser(user, Pageable.unpaged())).thenReturn(members);
 
         // Act
-        Optional<List<Organization>> result = memberService.findAllOrganizationsByUser(userId);
+        Optional<Page<Organization>> result = memberService.findAllOrganizationsByUser(userId, Pageable.unpaged());
 
         // Assert
         assertTrue(result.isPresent());
-        assertEquals(members.size(), result.get().size());
+        assertEquals(members.getTotalElements(), result.get().getTotalElements());
     }
 
     @Test

@@ -11,10 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,17 +47,18 @@ class InvitationDefaultServiceTest {
         // Arrange
         BigInteger userId = BigInteger.ONE;
         User user = new User();
-        List<Invitation> expectedInvitations = new ArrayList<>();
+        Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(invitationRepository.findAllByUser(user)).thenReturn(expectedInvitations);
+        when(invitationRepository.findAllByUser(user, pageRequest)).thenReturn(expectedInvitations);
 
         // Act
-        Optional<List<Invitation>> result = invitationService.findAllByUser(userId);
+        Optional<Page<Invitation>> result = invitationService.findAllByUser(userId, pageRequest);
 
         // Assert
         assertEquals(expectedInvitations, result.orElse(null));
         verify(userRepository).findById(userId);
-        verify(invitationRepository).findAllByUser(user);
+        verify(invitationRepository).findAllByUser(user, pageRequest);
     }
 
     @Test
@@ -64,17 +67,18 @@ class InvitationDefaultServiceTest {
         BigInteger userId = BigInteger.ONE;
         boolean isActive = true;
         User user = new User();
-        List<Invitation> expectedInvitations = new ArrayList<>();
+        Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(invitationRepository.findAllByUserAndIsActive(user, isActive)).thenReturn(expectedInvitations);
+        when(invitationRepository.findAllByUserAndIsActive(user, isActive, pageRequest)).thenReturn(expectedInvitations);
 
         // Act
-        Optional<List<Invitation>> result = invitationService.findAllByUserAndIsActive(userId, isActive);
+        Optional<Page<Invitation>> result = invitationService.findAllByUserAndIsActive(userId, isActive, pageRequest);
 
         // Assert
         assertEquals(expectedInvitations, result.orElse(null));
         verify(userRepository).findById(userId);
-        verify(invitationRepository).findAllByUserAndIsActive(user, isActive);
+        verify(invitationRepository).findAllByUserAndIsActive(user, isActive, pageRequest);
     }
 
     @Test
@@ -82,17 +86,18 @@ class InvitationDefaultServiceTest {
         // Arrange
         BigInteger organizationId = BigInteger.ONE;
         Organization organization = new Organization();
-        List<Invitation> expectedInvitations = new ArrayList<>();
+        Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
         when(organizationRepository.findById(organizationId)).thenReturn(Optional.of(organization));
-        when(invitationRepository.findAllByOrganization(organization)).thenReturn(expectedInvitations);
+        when(invitationRepository.findAllByOrganization(organization, pageRequest)).thenReturn(expectedInvitations);
 
         // Act
-        Optional<List<Invitation>> result = invitationService.findAllByOrganization(organizationId);
+        Optional<Page<Invitation>> result = invitationService.findAllByOrganization(organizationId, pageRequest);
 
         // Assert
         assertEquals(expectedInvitations, result.orElse(null));
         verify(organizationRepository).findById(organizationId);
-        verify(invitationRepository).findAllByOrganization(organization);
+        verify(invitationRepository).findAllByOrganization(organization, pageRequest);
     }
 
     @Test
@@ -101,17 +106,18 @@ class InvitationDefaultServiceTest {
         BigInteger organizationId = BigInteger.ONE;
         boolean isActive = true;
         Organization organization = new Organization();
-        List<Invitation> expectedInvitations = new ArrayList<>();
+        Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
         when(organizationRepository.findById(organizationId)).thenReturn(Optional.of(organization));
-        when(invitationRepository.findAllByOrganizationAndIsActive(organization, isActive)).thenReturn(expectedInvitations);
+        when(invitationRepository.findAllByOrganizationAndIsActive(organization, isActive, pageRequest)).thenReturn(expectedInvitations);
 
         // Act
-        Optional<List<Invitation>> result = invitationService.findAllByOrganizationAndIsActive(organizationId, isActive);
+        Optional<Page<Invitation>> result = invitationService.findAllByOrganizationAndIsActive(organizationId, isActive, pageRequest);
 
         // Assert
         assertEquals(expectedInvitations, result.orElse(null));
         verify(organizationRepository).findById(organizationId);
-        verify(invitationRepository).findAllByOrganizationAndIsActive(organization, isActive);
+        verify(invitationRepository).findAllByOrganizationAndIsActive(organization, isActive, pageRequest);
     }
 
     @Test
@@ -134,15 +140,16 @@ class InvitationDefaultServiceTest {
     void testFindAllByDateOfCreation() {
         // Arrange
         ZonedDateTime dateOfCreation = ZonedDateTime.now();
-        List<Invitation> expectedInvitations = new ArrayList<>();
-        when(invitationRepository.findAllByDateOfCreation(dateOfCreation)).thenReturn(expectedInvitations);
+        Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(invitationRepository.findAllByDateOfCreation(dateOfCreation, pageRequest)).thenReturn(expectedInvitations);
 
         // Act
-        List<Invitation> result = invitationService.findAllByDateOfCreation(dateOfCreation);
+        Page<Invitation> result = invitationService.findAllByDateOfCreation(dateOfCreation, pageRequest);
 
         // Assert
         assertEquals(expectedInvitations, result);
-        verify(invitationRepository).findAllByDateOfCreation(dateOfCreation);
+        verify(invitationRepository).findAllByDateOfCreation(dateOfCreation, pageRequest);
     }
 
     @Test

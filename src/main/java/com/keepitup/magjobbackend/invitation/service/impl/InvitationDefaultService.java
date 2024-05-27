@@ -6,11 +6,12 @@ import com.keepitup.magjobbackend.invitation.service.api.InvitationService;
 import com.keepitup.magjobbackend.organization.repository.api.OrganizationRepository;
 import com.keepitup.magjobbackend.user.repository.api.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,27 +32,27 @@ public class InvitationDefaultService implements InvitationService {
 
 
     @Override
-    public Optional<List<Invitation>> findAllByUser(BigInteger userId) {
+    public Optional<Page<Invitation>> findAllByUser(BigInteger userId, Pageable pageable) {
         return userRepository.findById(userId)
-                .map(invitationRepository::findAllByUser);
+                .map(invitation -> invitationRepository.findAllByUser(invitation, pageable));
     }
 
     @Override
-    public Optional<List<Invitation>> findAllByUserAndIsActive(BigInteger userId, Boolean isActive) {
+    public Optional<Page<Invitation>> findAllByUserAndIsActive(BigInteger userId, Boolean isActive, Pageable pageable) {
         return userRepository.findById(userId)
-                .map(user -> invitationRepository.findAllByUserAndIsActive(user, isActive));
+                .map(user -> invitationRepository.findAllByUserAndIsActive(user, isActive, pageable));
     }
 
     @Override
-    public Optional<List<Invitation>> findAllByOrganization(BigInteger organizationId) {
+    public Optional<Page<Invitation>> findAllByOrganization(BigInteger organizationId, Pageable pageable) {
         return organizationRepository.findById(organizationId)
-                .map(invitationRepository::findAllByOrganization);
+                .map(invitation -> invitationRepository.findAllByOrganization(invitation, pageable));
     }
 
     @Override
-    public Optional<List<Invitation>> findAllByOrganizationAndIsActive(BigInteger organizationId, Boolean isActive) {
+    public Optional<Page<Invitation>> findAllByOrganizationAndIsActive(BigInteger organizationId, Boolean isActive, Pageable pageable) {
         return organizationRepository.findById(organizationId)
-                .map(organization -> invitationRepository.findAllByOrganizationAndIsActive(organization, isActive));
+                .map(organization -> invitationRepository.findAllByOrganizationAndIsActive(organization, isActive, pageable));
     }
 
     @Override
@@ -60,8 +61,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public List<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation) {
-        return invitationRepository.findAllByDateOfCreation(dateOfCreation);
+    public Page<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable) {
+        return invitationRepository.findAllByDateOfCreation(dateOfCreation, pageable);
     }
 
     @Override

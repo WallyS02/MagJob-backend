@@ -5,7 +5,6 @@ import com.keepitup.magjobbackend.invitation.dto.GetInvitationResponse;
 import com.keepitup.magjobbackend.invitation.dto.GetInvitationsResponse;
 import com.keepitup.magjobbackend.invitation.dto.PostInvitationRequest;
 import com.keepitup.magjobbackend.member.dto.GetMemberResponse;
-import com.keepitup.magjobbackend.member.dto.PatchMemberRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,11 +38,23 @@ public interface InvitationController {
             BigInteger organizationId
     );
 
-    @Operation(summary = "Get Invitation By User")
+    @Operation(summary = "Get Invitations By User")
     @GetMapping("/api/users/{userId}/invitations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByUser(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "userId",
                     description = "User id value",
@@ -58,6 +69,18 @@ public interface InvitationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

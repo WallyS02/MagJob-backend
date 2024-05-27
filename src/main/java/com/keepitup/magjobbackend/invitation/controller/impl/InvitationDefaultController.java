@@ -20,6 +20,7 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,15 +70,17 @@ public class InvitationDefaultController implements InvitationController {
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByUser(BigInteger userId) {
-        return service.findAllByUserAndIsActive(userId, true)
+    public GetInvitationsResponse getInvitationsByUser(int page, int size, BigInteger userId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return service.findAllByUserAndIsActive(userId, true, pageRequest)
                 .map(invitationsToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByOrganization(BigInteger organizationId) {
-        return service.findAllByOrganizationAndIsActive(organizationId, true)
+    public GetInvitationsResponse getInvitationsByOrganization(int page, int size, BigInteger organizationId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return service.findAllByOrganizationAndIsActive(organizationId, true, pageRequest)
                 .map(invitationsToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }

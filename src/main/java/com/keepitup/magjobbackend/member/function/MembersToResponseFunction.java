@@ -2,15 +2,16 @@ package com.keepitup.magjobbackend.member.function;
 
 import com.keepitup.magjobbackend.member.dto.GetMembersResponse;
 import com.keepitup.magjobbackend.member.entity.Member;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 import java.util.List;
 
 @Component
-public class MembersToResponseFunction implements Function<List<Member>, GetMembersResponse> {
+public class MembersToResponseFunction implements Function<Page<Member>, GetMembersResponse> {
     @Override
-    public GetMembersResponse apply(List<Member> entities) {
+    public GetMembersResponse apply(Page<Member> entities) {
         return GetMembersResponse.builder()
                 .members(entities.stream()
                         .map(member -> GetMembersResponse.Member.builder()

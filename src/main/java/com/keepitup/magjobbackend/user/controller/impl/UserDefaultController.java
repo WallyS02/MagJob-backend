@@ -10,6 +10,7 @@ import com.keepitup.magjobbackend.user.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -58,8 +59,9 @@ public class UserDefaultController implements UserController {
     }
 
     @Override
-    public GetUsersResponse getUsers() {
-        return usersToResponse.apply(service.findAll());
+    public GetUsersResponse getUsers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return usersToResponse.apply(service.findAll(pageRequest));
     }
 
     @Override

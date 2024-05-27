@@ -1,6 +1,8 @@
 package com.keepitup.magjobbackend.user.service.api;
 
 import com.keepitup.magjobbackend.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -8,15 +10,18 @@ import java.util.Optional;
 
 public interface UserService {
     List<User> findAll();
+
+    Page<User> findAll(Pageable pageable);
+
     Optional<User> find(BigInteger id);
 
     Optional<User> find(String email);
 
-    List<User> findAllByFirstname(String firstname);
+    Page<User> findAllByFirstname(String firstname, Pageable pageable);
 
-    List<User> findAllByLastname(String lastname);
+    Page<User> findAllByLastname(String lastname, Pageable pageable);
 
-    List<User> findAllByFirstnameAndLastname(String firstname, String lastname);
+    Page<User> findAllByFirstnameAndLastname(String firstname, String lastname, Pageable pageable);
 
     void register(User user);
 

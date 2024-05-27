@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigInteger;
@@ -80,11 +83,12 @@ class UserDefaultServiceTest {
     void testFindAllByFirstname() {
         // Arrange
         String firstname = "John";
-        List<User> users = Arrays.asList(new User(), new User());
-        when(userRepository.findAllByFirstname(firstname)).thenReturn(users);
+        Page<User> users = new PageImpl<>(List.of(new User()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(userRepository.findAllByFirstname(firstname, pageRequest)).thenReturn(users);
 
         // Act
-        List<User> result = userService.findAllByFirstname(firstname);
+        Page<User> result = userService.findAllByFirstname(firstname, pageRequest);
 
         // Assert
         assertEquals(users, result);
@@ -94,11 +98,12 @@ class UserDefaultServiceTest {
     void testFindAllByLastname() {
         // Arrange
         String lastname = "Doe";
-        List<User> users = Arrays.asList(new User(), new User());
-        when(userRepository.findAllByLastname(lastname)).thenReturn(users);
+        Page<User> users = new PageImpl<>(List.of(new User()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(userRepository.findAllByLastname(lastname, pageRequest)).thenReturn(users);
 
         // Act
-        List<User> result = userService.findAllByLastname(lastname);
+        Page<User> result = userService.findAllByLastname(lastname, pageRequest);
 
         // Assert
         assertEquals(users, result);
@@ -109,11 +114,12 @@ class UserDefaultServiceTest {
         // Arrange
         String firstname = "John";
         String lastname = "Doe";
-        List<User> users = Arrays.asList(new User(), new User());
-        when(userRepository.findAllByFirstnameAndLastname(firstname, lastname)).thenReturn(users);
+        Page<User> users = new PageImpl<>(List.of(new User()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(userRepository.findAllByFirstnameAndLastname(firstname, lastname, pageRequest)).thenReturn(users);
 
         // Act
-        List<User> result = userService.findAllByFirstnameAndLastname(firstname, lastname);
+        Page<User> result = userService.findAllByFirstnameAndLastname(firstname, lastname, pageRequest);
 
         // Assert
         assertEquals(users, result);

@@ -1,9 +1,6 @@
 package com.keepitup.magjobbackend.role.controller.api;
 
-import com.keepitup.magjobbackend.role.dto.GetRoleResponse;
-import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
-import com.keepitup.magjobbackend.role.dto.PatchRoleRequest;
-import com.keepitup.magjobbackend.role.dto.PostRoleRequest;
+import com.keepitup.magjobbackend.role.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +36,7 @@ public interface RoleController {
     @GetMapping("api/organizations/{organizationId}/roles")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetRolesResponse getRolesByOrganization(
+    GetRolesByOrganizationResponse getRolesByOrganization(
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

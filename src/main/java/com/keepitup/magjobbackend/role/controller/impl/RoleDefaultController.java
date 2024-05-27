@@ -5,17 +5,10 @@ import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.impl.OrganizationDefaultService;
 import com.keepitup.magjobbackend.role.controller.api.RoleController;
-import com.keepitup.magjobbackend.role.dto.GetRoleResponse;
-import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
-import com.keepitup.magjobbackend.role.dto.PatchRoleRequest;
-import com.keepitup.magjobbackend.role.dto.PostRoleRequest;
+import com.keepitup.magjobbackend.role.dto.*;
 import com.keepitup.magjobbackend.role.entity.Role;
-import com.keepitup.magjobbackend.role.function.RequestToRoleFunction;
-import com.keepitup.magjobbackend.role.function.RoleToResponseFunction;
-import com.keepitup.magjobbackend.role.function.RolesToResponseFunction;
-import com.keepitup.magjobbackend.role.function.UpdateRoleWithRequestFunction;
+import com.keepitup.magjobbackend.role.function.*;
 import com.keepitup.magjobbackend.role.service.impl.RoleDefaultService;
-import com.keepitup.magjobbackend.task.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -32,6 +25,7 @@ public class RoleDefaultController implements RoleController {
     private final RolesToResponseFunction rolesToResponseFunction;
     private final RequestToRoleFunction requestToRoleFunction;
     private final UpdateRoleWithRequestFunction updateRoleWithRequestFunction;
+    private final RolesByOrganizationToResponseFunction rolesByOrganizationToResponseFunction;
     private final SecurityService securityService;
 
     @Autowired
@@ -42,6 +36,7 @@ public class RoleDefaultController implements RoleController {
             RolesToResponseFunction rolesToResponseFunction,
             RequestToRoleFunction requestToRoleFunction,
             UpdateRoleWithRequestFunction updateRoleWithRequestFunction,
+            RolesByOrganizationToResponseFunction rolesByOrganizationToResponseFunction,
             SecurityService securityService
     ) {
         this.roleService = roleService;
@@ -50,6 +45,7 @@ public class RoleDefaultController implements RoleController {
         this.rolesToResponseFunction = rolesToResponseFunction;
         this.requestToRoleFunction = requestToRoleFunction;
         this.updateRoleWithRequestFunction = updateRoleWithRequestFunction;
+        this.rolesByOrganizationToResponseFunction = rolesByOrganizationToResponseFunction;
         this.securityService = securityService;
     }
 
@@ -74,7 +70,7 @@ public class RoleDefaultController implements RoleController {
     }
 
     @Override
-    public GetRolesResponse getRolesByOrganization(BigInteger organizationId) {
+    public GetRolesByOrganizationResponse getRolesByOrganization(BigInteger organizationId) {
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
@@ -84,7 +80,7 @@ public class RoleDefaultController implements RoleController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        return rolesToResponseFunction.apply(roleService.findAllByOrganization(organization));
+        return rolesByOrganizationToResponseFunction.apply(roleService.findAllByOrganization(organization));
     }
 
     @Override

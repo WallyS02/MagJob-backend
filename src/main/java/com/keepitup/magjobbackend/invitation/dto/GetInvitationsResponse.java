@@ -39,4 +39,7 @@ public class GetInvitationsResponse {
     @Singular
     @Schema(description = "Invitation list")
     private List<Invitation> invitations;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

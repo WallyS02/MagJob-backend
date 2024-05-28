@@ -13,6 +13,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,7 +55,8 @@ public class OrganizationDefaultController implements OrganizationController {
     @Override
     public GetOrganizationsResponse getOrganizations(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return organizationsToResponse.apply(service.findAll(pageRequest));
+        Integer count = service.findAll().size();
+        return organizationsToResponse.apply(service.findAll(pageRequest), count);
     }
 
     @Override
@@ -67,12 +69,17 @@ public class OrganizationDefaultController implements OrganizationController {
     @Override
     public GetOrganizationsResponse getOrganizationsByUser(int page, int size, BigInteger id) {
         PageRequest pageRequest = PageRequest.of(page, size);
+
+        Optional<Page<Organization>> countOptional = memberService.findAllOrganizationsByUser(id, Pageable.unpaged());
+        Integer count = countOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getNumberOfElements();
+
         Optional<Page<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(id, pageRequest);
 
         Page<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return organizationsToResponse.apply(organizations);
+        return organizationsToResponse.apply(organizations, count);
     }
 
     @Override

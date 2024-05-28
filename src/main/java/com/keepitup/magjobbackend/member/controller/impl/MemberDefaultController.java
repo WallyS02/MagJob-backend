@@ -53,18 +53,22 @@ public class MemberDefaultController implements MemberController {
     @Override
     public GetMembersResponse getMembers(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return membersToResponse.apply(service.findAllByIsStillMember(true, pageRequest));
+        Integer count = service.findAllByIsStillMember(true, Pageable.unpaged()).getNumberOfElements();
+        return membersToResponse.apply(service.findAllByIsStillMember(true, pageRequest), count);
     }
 
     @Override
     public GetMembersResponse getMembersByOrganization(int page, int size, BigInteger organizationId) {
         PageRequest pageRequest = PageRequest.of(page, size);
+
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true, pageRequest));
+        Integer count = service.findAllByOrganizationAndIsStillMember(organization, true, Pageable.unpaged()).getNumberOfElements();
+
+        return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true, pageRequest), count);
     }
 
     @Override

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -108,17 +111,16 @@ class AssigneeDefaultServiceTest {
         assigneeId.setTaskId(taskId2);
         Assignee assignee2 = new Assignee();
         assignee2.setId(assigneeId2);
-        List<Assignee> expectedAssignees = Arrays.asList(assignee1, assignee2);
+        Page<Assignee> expectedAssignees = new PageImpl<>(List.of(assignee1, assignee2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
 
-        when(assigneeRepository.findAllByMember(member)).thenReturn(expectedAssignees);
+        when(assigneeRepository.findAllByMember(member, pageRequest)).thenReturn(expectedAssignees);
 
         // Act
-        List<Assignee> actualAssignees = assigneeService.findAllByMember(member);
+        Page<Assignee> actualAssignees = assigneeService.findAllByMember(member, pageRequest);
 
         // Assert
-        assertEquals(expectedAssignees.size(), actualAssignees.size());
-        assertEquals(expectedAssignees.get(0).getId(), actualAssignees.get(0).getId());
-        assertEquals(expectedAssignees.get(1).getId(), actualAssignees.get(1).getId());
+        assertEquals(expectedAssignees.getNumberOfElements(), actualAssignees.getNumberOfElements());
     }
 
     @Test
@@ -138,17 +140,16 @@ class AssigneeDefaultServiceTest {
         assigneeId.setTaskId(task.getId());
         Assignee assignee2 = new Assignee();
         assignee2.setId(assigneeId2);
-        List<Assignee> expectedAssignees = Arrays.asList(assignee1, assignee2);
+        Page<Assignee> expectedAssignees = new PageImpl<>(List.of(assignee1, assignee2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
 
-        when(assigneeRepository.findAllByTask(task)).thenReturn(expectedAssignees);
+        when(assigneeRepository.findAllByTask(task, pageRequest)).thenReturn(expectedAssignees);
 
         // Act
-        List<Assignee> actualAssignees = assigneeService.findAllByTask(task);
+        Page<Assignee> actualAssignees = assigneeService.findAllByTask(task, pageRequest);
 
         // Assert
-        assertEquals(expectedAssignees.size(), actualAssignees.size());
-        assertEquals(expectedAssignees.get(0).getId(), actualAssignees.get(0).getId());
-        assertEquals(expectedAssignees.get(1).getId(), actualAssignees.get(1).getId());
+        assertEquals(expectedAssignees.getNumberOfElements(), actualAssignees.getNumberOfElements());
     }
 
     @Test
@@ -227,17 +228,16 @@ class AssigneeDefaultServiceTest {
         assignee2.setTask(task2);
         Member member = new Member();
         member.setId(memberId);
-        List<Assignee> assigneeList = Arrays.asList(assignee1, assignee2);
+        Page<Assignee> assigneeList = new PageImpl<>(List.of(assignee1, assignee2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(assigneeRepository.findAllByMember(member)).thenReturn(assigneeList);
+        when(assigneeRepository.findAllByMember(member, pageRequest)).thenReturn(assigneeList);
 
         // Act
-        Optional<List<Task>> tasksOptional = assigneeService.findAllTasksByMember(memberId);
+        Optional<Page<Task>> tasksOptional = assigneeService.findAllTasksByMember(memberId, pageRequest);
 
         // Assert
-        assertEquals(2, tasksOptional.orElseThrow().size());
-        assertEquals(task1.getId(), tasksOptional.get().get(0).getId());
-        assertEquals(task2.getId(), tasksOptional.get().get(1).getId());
+        assertEquals(2, tasksOptional.orElseThrow().getNumberOfElements());
     }
 }

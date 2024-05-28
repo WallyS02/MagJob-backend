@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.task.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.task.dto.GetTaskResponse;
 import com.keepitup.magjobbackend.task.dto.GetTasksResponse;
 import com.keepitup.magjobbackend.task.dto.PatchTaskRequest;
@@ -15,12 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Task Controller")
 public interface TaskController {
+    PageConfig pageConfig = new PageConfig();
 
     @Operation(summary = "Get all Tasks")
     @GetMapping("api/tasks")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetTasksResponse getTasks();
+    GetTasksResponse getTasks(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Task of given id")
     @GetMapping("api/tasks/{id}")
@@ -43,6 +58,18 @@ public interface TaskController {
     @ResponseBody
     GetTasksResponse getTasksByOrganization(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "organizationId",
                     description = "Organization id value",
                     required = true
@@ -56,6 +83,18 @@ public interface TaskController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetTasksResponse getTasksByMember(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "memberId",
                     description = "Member id value",

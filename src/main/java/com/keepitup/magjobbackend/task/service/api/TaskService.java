@@ -2,6 +2,8 @@ package com.keepitup.magjobbackend.task.service.api;
 
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.task.entity.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -11,23 +13,25 @@ import java.util.Optional;
 public interface TaskService {
     List<Task> findAll();
 
+    Page<Task> findAll(Pageable pageable);
+
     Optional<Task> find(BigInteger id);
 
     Optional<Task> findByTitle(String title);
 
-    List<Task> findAllByOrganization(Organization organization);
+    Page<Task> findAllByOrganization(Organization organization, Pageable pageable);
 
-    List<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
+    Page<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
 
-    List<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion);
+    Page<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion, Pageable pageable);
 
-    List<Task> findAllByIsDone(Boolean isDone);
+    Page<Task> findAllByIsDone(Boolean isDone, Pageable pageable);
 
-    List<Task> findAllByDescription(String description);
+    Page<Task> findAllByDescription(String description, Pageable pageable);
 
-    List<Task> findAllByIsImportant(Boolean isImportant);
+    Page<Task> findAllByIsImportant(Boolean isImportant, Pageable pageable);
 
-    List<Task> findAllByDeadLine(ZonedDateTime deadLine);
+    Page<Task> findAllByDeadLine(ZonedDateTime deadLine, Pageable pageable);
 
     void create(Task task);
 

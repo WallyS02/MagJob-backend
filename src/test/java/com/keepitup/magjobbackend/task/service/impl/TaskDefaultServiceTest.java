@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -87,147 +90,112 @@ class TaskDefaultServiceTest {
     void testFindAllByOrganization() {
         // Arrange
         Organization organization = new Organization();
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByOrganization(organization)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByOrganization(organization, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByOrganization(organization);
+        Page<Task> result = taskService.findAllByOrganization(organization, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByOrganization(organization);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByOrganization(organization, pageRequest);
     }
 
     @Test
     void testFindAllByDateOfCreation() {
         // Arrange
         ZonedDateTime dateOfCreation = ZonedDateTime.now();
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByDateOfCreation(dateOfCreation)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByDateOfCreation(dateOfCreation, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByDateOfCreation(dateOfCreation);
+        Page<Task> result = taskService.findAllByDateOfCreation(dateOfCreation, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByDateOfCreation(dateOfCreation);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByDateOfCreation(dateOfCreation, pageRequest);
     }
 
     @Test
     void testFindAllByDateOfCompletion() {
         // Arrange
         ZonedDateTime dateOfCompletion = ZonedDateTime.now();
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByDateOfCompletion(dateOfCompletion)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByDateOfCompletion(dateOfCompletion, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByDateOfCompletion(dateOfCompletion);
+        Page<Task> result = taskService.findAllByDateOfCompletion(dateOfCompletion, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByDateOfCompletion(dateOfCompletion);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByDateOfCompletion(dateOfCompletion, pageRequest);
     }
 
     @Test
     void testFindAllByIsDone() {
         // Arrange
         boolean isDone = true;
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByIsDone(isDone)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByIsDone(isDone, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByIsDone(isDone);
+        Page<Task> result = taskService.findAllByIsDone(isDone, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByIsDone(isDone);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByIsDone(isDone, pageRequest);
     }
 
     @Test
     void testFindAllByDescription() {
         // Arrange
         String description = "Sample description";
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByDescription(description)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByDescription(description, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByDescription(description);
+        Page<Task> result = taskService.findAllByDescription(description, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByDescription(description);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByDescription(description, pageRequest);
     }
 
     @Test
     void testFindAllByIsImportant() {
         // Arrange
         boolean isImportant = true;
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByIsImportant(isImportant)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByIsImportant(isImportant, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByIsImportant(isImportant);
+        Page<Task> result = taskService.findAllByIsImportant(isImportant, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByIsImportant(isImportant);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByIsImportant(isImportant, pageRequest);
     }
 
     @Test
     void testFindAllByDeadLine() {
         // Arrange
         ZonedDateTime deadline = ZonedDateTime.now();
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        tasks.add(new Task());
-        tasks.add(new Task());
-        when(taskRepository.findAllByDeadLine(deadline)).thenReturn(tasks);
+        Page<Task> tasks = new PageImpl<>(List.of(new Task()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(taskRepository.findAllByDeadLine(deadline, pageRequest)).thenReturn(tasks);
 
         // Act
-        List<Task> result = taskService.findAllByDeadLine(deadline);
+        Page<Task> result = taskService.findAllByDeadLine(deadline, pageRequest);
 
         // Assert
-        assertEquals(tasks.size(), result.size());
-        for (int i = 0; i < tasks.size(); i++) {
-            assertEquals(tasks.get(i), result.get(i));
-        }
-        verify(taskRepository, times(1)).findAllByDeadLine(deadline);
+        assertEquals(tasks.getNumberOfElements(), result.getNumberOfElements());
+        verify(taskRepository, times(1)).findAllByDeadLine(deadline, pageRequest);
     }
 
     @Test

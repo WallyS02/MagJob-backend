@@ -14,6 +14,7 @@ import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.impl.OrganizationDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,8 +50,10 @@ public class AnnouncementDefaultController implements AnnouncementController {
     }
 
     @Override
-    public GetAnnouncementsResponse getAnnouncements() {
-        return announcementsToResponseFunction.apply(announcementService.findAll());
+    public GetAnnouncementsResponse getAnnouncements(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = announcementService.findAll().size();
+        return announcementsToResponseFunction.apply(announcementService.findAll(pageRequest), count);
     }
 
     @Override
@@ -61,13 +64,16 @@ public class AnnouncementDefaultController implements AnnouncementController {
     }
 
     @Override
-    public GetAnnouncementsResponse getAnnouncementsByOrganization(BigInteger organizationId) {
+    public GetAnnouncementsResponse getAnnouncementsByOrganization(int page, int size, BigInteger organizationId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return announcementsToResponseFunction.apply(announcementService.findAllByOrganization(organization));
+        Integer count = announcementService.findAllByOrganization(organization, pageRequest).getNumberOfElements();
+
+        return announcementsToResponseFunction.apply(announcementService.findAllByOrganization(organization, pageRequest), count);
     }
 
     @Override

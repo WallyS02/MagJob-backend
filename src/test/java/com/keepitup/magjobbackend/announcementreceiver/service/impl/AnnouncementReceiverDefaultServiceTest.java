@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -68,30 +71,32 @@ class AnnouncementReceiverDefaultServiceTest {
     void testFindAllByMember() {
         // Arrange
         Member member = new Member();
-        List<AnnouncementReceiver> expectedList = new ArrayList<>();
-        when(announcementReceiverRepository.findAllByMember(member)).thenReturn(expectedList);
+        Page<AnnouncementReceiver> announcementReceivers = new PageImpl<>(List.of(new AnnouncementReceiver()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(announcementReceiverRepository.findAllByMember(member, pageRequest)).thenReturn(announcementReceivers);
 
         // Act
-        List<AnnouncementReceiver> result = announcementReceiverService.findAllByMember(member);
+        Page<AnnouncementReceiver> result = announcementReceiverService.findAllByMember(member, pageRequest);
 
         // Assert
-        assertEquals(expectedList, result);
-        verify(announcementReceiverRepository, times(1)).findAllByMember(member);
+        assertEquals(announcementReceivers, result);
+        verify(announcementReceiverRepository, times(1)).findAllByMember(member, pageRequest);
     }
 
     @Test
     void testFindAllByAnnouncement() {
         // Arrange
         Announcement announcement = new Announcement();
-        List<AnnouncementReceiver> expectedList = new ArrayList<>();
-        when(announcementReceiverRepository.findAllByAnnouncement(announcement)).thenReturn(expectedList);
+        Page<AnnouncementReceiver> announcementReceivers = new PageImpl<>(List.of(new AnnouncementReceiver()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(announcementReceiverRepository.findAllByAnnouncement(announcement, pageRequest)).thenReturn(announcementReceivers);
 
         // Act
-        List<AnnouncementReceiver> result = announcementReceiverService.findAllByAnnouncement(announcement);
+        Page<AnnouncementReceiver> result = announcementReceiverService.findAllByAnnouncement(announcement, pageRequest);
 
         // Assert
-        assertEquals(expectedList, result);
-        verify(announcementReceiverRepository, times(1)).findAllByAnnouncement(announcement);
+        assertEquals(announcementReceivers, result);
+        verify(announcementReceiverRepository, times(1)).findAllByAnnouncement(announcement, pageRequest);
     }
 
     @Test

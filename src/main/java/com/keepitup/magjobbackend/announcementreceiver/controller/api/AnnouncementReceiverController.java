@@ -4,6 +4,7 @@ import com.keepitup.magjobbackend.announcementreceiver.dto.GetAnnouncementReceiv
 import com.keepitup.magjobbackend.announcementreceiver.dto.GetAnnouncementReceiversResponse;
 import com.keepitup.magjobbackend.announcementreceiver.dto.PatchAnnouncementReceiverRequest;
 import com.keepitup.magjobbackend.announcementreceiver.dto.PostAnnouncementReceiverRequest;
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Announcement Receiver Controller")
 public interface AnnouncementReceiverController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Announcement Receivers")
     @GetMapping("api/announcement-receivers")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetAnnouncementReceiversResponse getAnnouncementReceivers();
+    GetAnnouncementReceiversResponse getAnnouncementReceivers(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Announcement Receiver of given id")
     @GetMapping("api/announcement-receivers/{id}")
@@ -41,6 +57,18 @@ public interface AnnouncementReceiverController {
     @ResponseBody
     GetAnnouncementReceiversResponse getAnnouncementReceiversByAnnouncement(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "announcementId",
                     description = "Announcement id value",
                     required = true
@@ -54,6 +82,18 @@ public interface AnnouncementReceiverController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetAnnouncementReceiversResponse getAnnouncementReceiversByMember(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "memberId",
                     description = "Member id value",

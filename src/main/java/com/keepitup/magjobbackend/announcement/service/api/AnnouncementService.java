@@ -2,6 +2,8 @@ package com.keepitup.magjobbackend.announcement.service.api;
 
 import com.keepitup.magjobbackend.announcement.entity.Announcement;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -13,13 +15,15 @@ public interface AnnouncementService {
 
     List<Announcement> findAll();
 
+    Page<Announcement> findAll(Pageable pageable);
+
     Optional<Announcement> findByTitle(String title);
 
-    List<Announcement> findAllByContent(String content);
+    Page<Announcement> findAllByContent(String content, Pageable pageable);
 
-    List<Announcement> findAllByDateOfExpiration(ZonedDateTime dateOfExpiration);
+    Page<Announcement> findAllByDateOfExpiration(ZonedDateTime dateOfExpiration, Pageable pageable);
 
-    List<Announcement> findAllByOrganization(Organization organization);
+    Page<Announcement> findAllByOrganization(Organization organization, Pageable pageable);
 
     void create(Announcement announcement);
 

@@ -61,7 +61,8 @@ public class UserDefaultController implements UserController {
     @Override
     public GetUsersResponse getUsers(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return usersToResponse.apply(service.findAll(pageRequest));
+        Integer count = service.findAll().size();
+        return usersToResponse.apply(service.findAll(pageRequest), count);
     }
 
     @Override

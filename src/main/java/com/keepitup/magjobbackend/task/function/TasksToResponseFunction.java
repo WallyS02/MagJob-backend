@@ -2,16 +2,16 @@ package com.keepitup.magjobbackend.task.function;
 
 import com.keepitup.magjobbackend.task.dto.GetTasksResponse;
 import com.keepitup.magjobbackend.task.entity.Task;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Component
-public class TasksToResponseFunction implements Function<List<Task>, GetTasksResponse> {
+public class TasksToResponseFunction implements BiFunction<Page<Task>, Integer, GetTasksResponse> {
 
     @Override
-    public GetTasksResponse apply(List<Task> entities) {
+    public GetTasksResponse apply(Page<Task> entities, Integer count) {
         return GetTasksResponse.builder()
                 .tasks(entities.stream()
                         .map(task -> GetTasksResponse.Task.builder()
@@ -25,6 +25,7 @@ public class TasksToResponseFunction implements Function<List<Task>, GetTasksRes
                                 .isDone(task.getIsDone())
                                 .build())
                         .toList())
+                .count(count)
                 .build();
     }
 }

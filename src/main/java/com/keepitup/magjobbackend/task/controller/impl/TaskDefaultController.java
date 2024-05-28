@@ -17,12 +17,14 @@ import com.keepitup.magjobbackend.task.service.api.TaskService;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -58,8 +60,10 @@ public class TaskDefaultController implements TaskController {
     }
 
     @Override
-    public GetTasksResponse getTasks() {
-        return tasksToResponse.apply(service.findAll());
+    public GetTasksResponse getTasks(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = service.findAll().size();
+        return tasksToResponse.apply(service.findAll(pageRequest), count);
     }
 
     @Override
@@ -70,21 +74,28 @@ public class TaskDefaultController implements TaskController {
     }
 
     @Override
-    public GetTasksResponse getTasksByOrganization(BigInteger id) {
+    public GetTasksResponse getTasksByOrganization(int page, int size, BigInteger id) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
         Organization organization = organizationService.find(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return tasksToResponse.apply(service.findAllByOrganization(organization));
+        Integer count = service.findAllByOrganization(organization, Pageable.unpaged()).getNumberOfElements();
+
+        return tasksToResponse.apply(service.findAllByOrganization(organization, pageRequest), count);
     }
 
     @Override
-    public GetTasksResponse getTasksByMember(BigInteger id) {
-        Optional<List<Task>> tasksOptional = assigneeService.findAllTasksByMember(id);
+    public GetTasksResponse getTasksByMember(int page, int size, BigInteger id) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Optional<Page<Task>> tasksOptional = assigneeService.findAllTasksByMember(id, pageRequest);
 
-        List<Task> tasks = tasksOptional
+        Integer count = assigneeService.findAllTasksByMember(id, Pageable.unpaged()).get().getNumberOfElements();
+
+        Page<Task> tasks = tasksOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return tasksToResponse.apply(tasks);
+        return tasksToResponse.apply(tasks, count);
     }
 
     @Override

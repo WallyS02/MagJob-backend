@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.task.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -39,4 +40,7 @@ public class GetTasksResponse {
 
     @Singular
     private List<Task> tasks;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

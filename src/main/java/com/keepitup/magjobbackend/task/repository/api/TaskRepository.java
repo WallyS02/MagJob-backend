@@ -2,29 +2,30 @@ package com.keepitup.magjobbackend.task.repository.api;
 
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.task.entity.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, BigInteger> {
     Optional<Task> findByTitle(String title);
 
-    List<Task> findAllByOrganization(Organization organization);
+    Page<Task> findAllByOrganization(Organization organization, Pageable pageable);
 
-    List<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
+    Page<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
 
-    List<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion);
+    Page<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion, Pageable pageable);
 
-    List<Task> findAllByIsDone(Boolean isDone);
+    Page<Task> findAllByIsDone(Boolean isDone, Pageable pageable);
 
-    List<Task> findAllByDescription(String description);
+    Page<Task> findAllByDescription(String description, Pageable pageable);
 
-    List<Task> findAllByIsImportant(Boolean isImportant);
+    Page<Task> findAllByIsImportant(Boolean isImportant, Pageable pageable);
 
-    List<Task> findAllByDeadLine(ZonedDateTime deadLine);
+    Page<Task> findAllByDeadLine(ZonedDateTime deadLine, Pageable pageable);
 }

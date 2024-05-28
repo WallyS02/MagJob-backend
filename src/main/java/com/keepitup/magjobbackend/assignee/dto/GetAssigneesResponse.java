@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.assignee.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -30,4 +31,7 @@ public class GetAssigneesResponse {
 
     @Singular
     private List<Assignee> assignees;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

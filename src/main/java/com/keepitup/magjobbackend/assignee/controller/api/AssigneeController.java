@@ -51,11 +51,23 @@ public interface AssigneeController {
             PostAssigneeRequest request
     );
 
-    @Operation(summary = "Get Assignee of given Task id")
+    @Operation(summary = "Get Assignees of given Task id")
     @GetMapping("/api/tasks/{taskId}/assignees")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetAssigneesResponse getAssigneesByTask(
+        @Parameter(
+                name = "page number",
+                description = "Page number to retrieve"
+        )
+        @RequestParam(defaultValue = "#{pageConfig.number}")
+        int page,
+        @Parameter(
+                name = "page size",
+                description = "Number of records per page"
+        )
+        @RequestParam(defaultValue = "#{pageConfig.size}")
+        int size,
         @Parameter(
                 name = "id",
                 description = "Task id value",

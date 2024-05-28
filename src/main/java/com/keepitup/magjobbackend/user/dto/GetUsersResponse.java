@@ -36,4 +36,6 @@ public class GetUsersResponse {
     @Schema(description = "User list")
     private List<User> users;
 
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

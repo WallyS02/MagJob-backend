@@ -36,4 +36,6 @@ public class GetOrganizationsResponse {
     @Schema(description = "Organization list")
     private List<Organization> organizations;
 
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

@@ -5,13 +5,12 @@ import com.keepitup.magjobbackend.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
-import java.util.List;
+import java.util.function.BiFunction;
 
 @Component
-public class MembersToResponseFunction implements Function<Page<Member>, GetMembersResponse> {
+public class MembersToResponseFunction implements BiFunction<Page<Member>, Integer, GetMembersResponse> {
     @Override
-    public GetMembersResponse apply(Page<Member> entities) {
+    public GetMembersResponse apply(Page<Member> entities, Integer count) {
         return GetMembersResponse.builder()
                 .members(entities.stream()
                         .map(member -> GetMembersResponse.Member.builder()
@@ -22,6 +21,7 @@ public class MembersToResponseFunction implements Function<Page<Member>, GetMemb
                                 .lastName(member.getUser().getLastname())
                                 .build())
                         .toList())
+                .count(count)
                 .build();
     }
 }

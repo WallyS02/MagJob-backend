@@ -3,6 +3,8 @@ package com.keepitup.magjobbackend.materialreceiver.service.api;
 import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.materialreceiver.entity.MaterialReceiver;
 import com.keepitup.magjobbackend.member.entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,9 +15,11 @@ public interface MaterialReceiverService {
 
     List<MaterialReceiver> findAll();
 
-    List<MaterialReceiver> findAllByMember(Member member);
+    Page<MaterialReceiver> findAll(Pageable pageable);
 
-    List<MaterialReceiver> findAllByMaterial(Material material);
+    Page<MaterialReceiver> findAllByMember(Member member, Pageable pageable);
+
+    Page<MaterialReceiver> findAllByMaterial(Material material, Pageable pageable);
 
     Optional<MaterialReceiver> findByMemberAndMaterial(Member member, Material material);
 

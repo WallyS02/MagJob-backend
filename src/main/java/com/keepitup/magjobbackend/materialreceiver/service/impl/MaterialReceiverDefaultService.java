@@ -6,6 +6,8 @@ import com.keepitup.magjobbackend.materialreceiver.repository.api.MaterialReceiv
 import com.keepitup.magjobbackend.materialreceiver.service.api.MaterialReceiverService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -32,13 +34,18 @@ public class MaterialReceiverDefaultService implements MaterialReceiverService {
     }
 
     @Override
-    public List<MaterialReceiver> findAllByMember(Member member) {
-        return materialReceiverRepository.findAllByMember(member);
+    public Page<MaterialReceiver> findAll(Pageable pageable) {
+        return materialReceiverRepository.findAll(pageable);
     }
 
     @Override
-    public List<MaterialReceiver> findAllByMaterial(Material material) {
-        return materialReceiverRepository.findAllByMaterial(material);
+    public Page<MaterialReceiver> findAllByMember(Member member, Pageable pageable) {
+        return materialReceiverRepository.findAllByMember(member, pageable);
+    }
+
+    @Override
+    public Page<MaterialReceiver> findAllByMaterial(Material material, Pageable pageable) {
+        return materialReceiverRepository.findAllByMaterial(material, pageable);
     }
 
     @Override

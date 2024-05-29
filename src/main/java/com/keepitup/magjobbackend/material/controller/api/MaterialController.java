@@ -19,7 +19,20 @@ public interface MaterialController {
     @GetMapping("api/materials")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetMaterialsResponse getMaterials();
+    GetMaterialsResponse getMaterials(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Material of given id")
     @GetMapping("api/materials/{id}")
@@ -40,6 +53,18 @@ public interface MaterialController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetMaterialsResponse getMaterialsByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

@@ -5,6 +5,8 @@ import com.keepitup.magjobbackend.material.repository.api.MaterialRepository;
 import com.keepitup.magjobbackend.material.service.api.MaterialService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -32,33 +34,38 @@ public class MaterialDefaultService implements MaterialService {
     }
 
     @Override
+    public Page<Material> findAll(Pageable pageable) {
+        return materialRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Material> findByTitle(String title) {
         return materialRepository.findByTitle(title);
     }
 
     @Override
-    public List<Material> findAllByDescription(String description) {
-        return materialRepository.findAllByDescription(description);
+    public Page<Material> findAllByDescription(String description, Pageable pageable) {
+        return materialRepository.findAllByDescription(description, pageable);
     }
 
     @Override
-    public List<Material> findAllBySize(Long size) {
-        return materialRepository.findAllBySize(size);
+    public Page<Material> findAllBySize(Long size, Pageable pageable) {
+        return materialRepository.findAllBySize(size, pageable);
     }
 
     @Override
-    public List<Material> findAllByContentType(String contentType) {
-        return materialRepository.findAllByContentType(contentType);
+    public Page<Material> findAllByContentType(String contentType, Pageable pageable) {
+        return materialRepository.findAllByContentType(contentType, pageable);
     }
 
     @Override
-    public List<Material> findAllByDateOfCreation(ZonedDateTime dateOfCreation) {
-        return materialRepository.findAllByDateOfCreation(dateOfCreation);
+    public Page<Material> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable) {
+        return materialRepository.findAllByDateOfCreation(dateOfCreation, pageable);
     }
 
     @Override
-    public List<Material> findAllByOrganization(Organization organization) {
-        return materialRepository.findAllByOrganization(organization);
+    public Page<Material> findAllByOrganization(Organization organization, Pageable pageable) {
+        return materialRepository.findAllByOrganization(organization, pageable);
     }
 
     @Override

@@ -19,7 +19,20 @@ public interface MaterialReceiverController {
     @GetMapping("api/material-receivers")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetMaterialReceiversResponse getMaterialReceivers();
+    GetMaterialReceiversResponse getMaterialReceivers(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Material Receiver of given id")
     @GetMapping("api/material-receivers/{id}")
@@ -41,6 +54,18 @@ public interface MaterialReceiverController {
     @ResponseBody
     GetMaterialReceiversResponse getMaterialReceiversByMaterial(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "materialId",
                     description = "Material id value",
                     required = true
@@ -54,6 +79,18 @@ public interface MaterialReceiverController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetMaterialReceiversResponse getMaterialReceiversByMember(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "memberId",
                     description = "Member id value",

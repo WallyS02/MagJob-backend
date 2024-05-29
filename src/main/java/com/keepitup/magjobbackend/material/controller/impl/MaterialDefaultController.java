@@ -14,6 +14,8 @@ import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.impl.OrganizationDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,8 +51,10 @@ public class MaterialDefaultController implements MaterialController {
     }
 
     @Override
-    public GetMaterialsResponse getMaterials() {
-        return materialsToResponseFunction.apply(materialService.findAll());
+    public GetMaterialsResponse getMaterials(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = materialService.findAll().size();
+        return materialsToResponseFunction.apply(materialService.findAll(pageRequest), count);
     }
 
     @Override
@@ -61,13 +65,16 @@ public class MaterialDefaultController implements MaterialController {
     }
 
     @Override
-    public GetMaterialsResponse getMaterialsByOrganization(BigInteger organizationId) {
+    public GetMaterialsResponse getMaterialsByOrganization(int page, int size, BigInteger organizationId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return materialsToResponseFunction.apply(materialService.findAllByOrganization(organization));
+        Integer count = materialService.findAllByOrganization(organization, Pageable.unpaged()).getNumberOfElements();
+
+        return materialsToResponseFunction.apply(materialService.findAllByOrganization(organization, pageRequest), count);
     }
 
     @Override

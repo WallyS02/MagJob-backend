@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.materialreceiver.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.materialreceiver.dto.GetMaterialReceiverResponse;
 import com.keepitup.magjobbackend.materialreceiver.dto.GetMaterialReceiversResponse;
 import com.keepitup.magjobbackend.materialreceiver.dto.PatchMaterialReceiverRequest;
@@ -15,11 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Material Receiver Controller")
 public interface MaterialReceiverController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Material Receivers")
     @GetMapping("api/material-receivers")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetMaterialReceiversResponse getMaterialReceivers();
+    GetMaterialReceiversResponse getMaterialReceivers(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Material Receiver of given id")
     @GetMapping("api/material-receivers/{id}")
@@ -41,6 +57,18 @@ public interface MaterialReceiverController {
     @ResponseBody
     GetMaterialReceiversResponse getMaterialReceiversByMaterial(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "materialId",
                     description = "Material id value",
                     required = true
@@ -54,6 +82,18 @@ public interface MaterialReceiverController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetMaterialReceiversResponse getMaterialReceiversByMember(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "memberId",
                     description = "Member id value",

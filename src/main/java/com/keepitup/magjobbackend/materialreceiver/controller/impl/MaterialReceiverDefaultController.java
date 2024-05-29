@@ -15,6 +15,8 @@ import com.keepitup.magjobbackend.materialreceiver.service.impl.MaterialReceiver
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
 import lombok.extern.java.Log;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -52,8 +54,10 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
     }
 
     @Override
-    public GetMaterialReceiversResponse getMaterialReceivers() {
-        return materialReceiversToResponseFunction.apply(materialReceiverService.findAll());
+    public GetMaterialReceiversResponse getMaterialReceivers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = materialReceiverService.findAll().size();
+        return materialReceiversToResponseFunction.apply(materialReceiverService.findAll(pageRequest), count);
     }
 
     @Override
@@ -64,23 +68,29 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
     }
 
     @Override
-    public GetMaterialReceiversResponse getMaterialReceiversByMaterial(BigInteger materialId) {
+    public GetMaterialReceiversResponse getMaterialReceiversByMaterial(int page, int size, BigInteger materialId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Material> materialOptional = materialService.find(materialId);
 
         Material material = materialOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return materialReceiversToResponseFunction.apply(materialReceiverService.findAllByMaterial(material));
+        Integer count = materialReceiverService.findAllByMaterial(material, Pageable.unpaged()).getNumberOfElements();
+
+        return materialReceiversToResponseFunction.apply(materialReceiverService.findAllByMaterial(material, pageRequest), count);
     }
 
     @Override
-    public GetMaterialReceiversResponse getMaterialReceiversByMember(BigInteger memberId) {
+    public GetMaterialReceiversResponse getMaterialReceiversByMember(int page, int size, BigInteger memberId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Member> memberOptional = memberService.find(memberId);
 
         Member member = memberOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return materialReceiversToResponseFunction.apply(materialReceiverService.findAllByMember(member));
+        Integer count = materialReceiverService.findAllByMember(member, Pageable.unpaged()).getNumberOfElements();
+
+        return materialReceiversToResponseFunction.apply(materialReceiverService.findAllByMember(member, pageRequest), count);
     }
 
     @Override

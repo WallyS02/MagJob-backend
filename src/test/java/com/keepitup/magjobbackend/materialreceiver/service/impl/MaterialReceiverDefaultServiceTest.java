@@ -8,6 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
@@ -65,36 +69,34 @@ class MaterialReceiverDefaultServiceTest {
     void testFindAllByMember() {
         // Arrange
         Member member = new Member();
-        MaterialReceiver materialReceiver1 = new MaterialReceiver();
-        MaterialReceiver materialReceiver2 = new MaterialReceiver();
-        when(materialReceiverRepository.findAllByMember(member)).thenReturn(Arrays.asList(materialReceiver1, materialReceiver2));
+        Page<MaterialReceiver> materialReceivers = new PageImpl<>(List.of(new MaterialReceiver()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialReceiverRepository.findAllByMember(member, pageRequest)).thenReturn(materialReceivers);
 
         // Act
-        List<MaterialReceiver> result = materialReceiverService.findAllByMember(member);
+        Page<MaterialReceiver> result = materialReceiverService.findAllByMember(member, pageRequest);
 
         // Assert
-        assertEquals(2, result.size());
-        assertTrue(result.contains(materialReceiver1));
-        assertTrue(result.contains(materialReceiver2));
-        verify(materialReceiverRepository, times(1)).findAllByMember(member);
+        assertEquals(materialReceivers.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materialReceivers, result);
+        verify(materialReceiverRepository, times(1)).findAllByMember(member, pageRequest);
     }
 
     @Test
     void testFindAllByMaterial() {
         // Arrange
         Material material = new Material();
-        MaterialReceiver materialReceiver1 = new MaterialReceiver();
-        MaterialReceiver materialReceiver2 = new MaterialReceiver();
-        when(materialReceiverRepository.findAllByMaterial(material)).thenReturn(Arrays.asList(materialReceiver1, materialReceiver2));
+        Page<MaterialReceiver> materialReceivers = new PageImpl<>(List.of(new MaterialReceiver()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialReceiverRepository.findAllByMaterial(material, pageRequest)).thenReturn(materialReceivers);
 
         // Act
-        List<MaterialReceiver> result = materialReceiverService.findAllByMaterial(material);
+        Page<MaterialReceiver> result = materialReceiverService.findAllByMaterial(material, pageRequest);
 
         // Assert
-        assertEquals(2, result.size());
-        assertTrue(result.contains(materialReceiver1));
-        assertTrue(result.contains(materialReceiver2));
-        verify(materialReceiverRepository, times(1)).findAllByMaterial(material);
+        assertEquals(materialReceivers.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materialReceivers, result);
+        verify(materialReceiverRepository, times(1)).findAllByMaterial(material, pageRequest);
     }
 
     @Test

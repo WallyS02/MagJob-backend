@@ -37,4 +37,7 @@ public class GetMaterialReceiversResponse {
     @Singular
     @Schema(description = "Material receiver list")
     private List<GetMaterialReceiversResponse.MaterialReceiver> materialReceivers;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

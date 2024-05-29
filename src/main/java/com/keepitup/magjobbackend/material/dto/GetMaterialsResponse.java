@@ -40,4 +40,7 @@ public class GetMaterialsResponse {
     @Singular
     @Schema(description = "Material list")
     private List<GetMaterialsResponse.Material> materials;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

@@ -2,15 +2,15 @@ package com.keepitup.magjobbackend.material.function;
 
 import com.keepitup.magjobbackend.material.dto.GetMaterialsResponse;
 import com.keepitup.magjobbackend.material.entity.Material;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Component
-public class MaterialsToResponseFunction implements Function<List<Material>, GetMaterialsResponse> {
+public class MaterialsToResponseFunction implements BiFunction<Page<Material>, Integer, GetMaterialsResponse> {
     @Override
-    public GetMaterialsResponse apply(List<Material> materials) {
+    public GetMaterialsResponse apply(Page<Material> materials, Integer count) {
         return GetMaterialsResponse.builder()
                 .materials(materials.stream()
                         .map(material -> GetMaterialsResponse.Material.builder()
@@ -20,6 +20,7 @@ public class MaterialsToResponseFunction implements Function<List<Material>, Get
                                 .organizationId(material.getOrganization().getId())
                                 .build())
                         .toList())
+                .count(count)
                 .build();
     }
 }

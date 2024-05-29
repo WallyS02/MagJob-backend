@@ -7,6 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -79,85 +83,80 @@ class MaterialDefaultServiceTest {
     void testFindAllByDescription() {
         // Arrange
         String description = "Test description";
-        List<Material> expectedMaterials = new ArrayList<>();
-        expectedMaterials.add(new Material());
-        expectedMaterials.add(new Material());
-        when(materialRepository.findAllByDescription(description)).thenReturn(expectedMaterials);
+        Page<Material> materials = new PageImpl<>(List.of(new Material()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialRepository.findAllByDescription(description, pageRequest)).thenReturn(materials);
 
         // Act
-        List<Material> result = materialService.findAllByDescription(description);
+        Page<Material> result = materialService.findAllByDescription(description, pageRequest);
 
         // Assert
-        assertEquals(expectedMaterials.size(), result.size());
-        assertEquals(expectedMaterials, result);
+        assertEquals(materials.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materials, result);
     }
 
     @Test
     void testFindAllBySize() {
         // Arrange
         Long size = 100L;
-        List<Material> expectedMaterials = new ArrayList<>();
-        expectedMaterials.add(new Material());
-        expectedMaterials.add(new Material());
-        when(materialRepository.findAllBySize(size)).thenReturn(expectedMaterials);
+        Page<Material> materials = new PageImpl<>(List.of(new Material()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialRepository.findAllBySize(size, pageRequest)).thenReturn(materials);
 
         // Act
-        List<Material> result = materialService.findAllBySize(size);
+        Page<Material> result = materialService.findAllBySize(size, pageRequest);
 
         // Assert
-        assertEquals(expectedMaterials.size(), result.size());
-        assertEquals(expectedMaterials, result);
+        assertEquals(materials.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materials, result);
     }
 
     @Test
     void testFindAllByContentType() {
         // Arrange
         String contentType = ".txt";
-        List<Material> expectedMaterials = new ArrayList<>();
-        expectedMaterials.add(new Material());
-        expectedMaterials.add(new Material());
-        when(materialRepository.findAllByContentType(contentType)).thenReturn(expectedMaterials);
+        Page<Material> materials = new PageImpl<>(List.of(new Material()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialRepository.findAllByContentType(contentType, pageRequest)).thenReturn(materials);
 
         // Act
-        List<Material> result = materialService.findAllByContentType(contentType);
+        Page<Material> result = materialService.findAllByContentType(contentType, pageRequest);
 
         // Assert
-        assertEquals(expectedMaterials.size(), result.size());
-        assertEquals(expectedMaterials, result);
+        assertEquals(materials.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materials, result);
     }
 
     @Test
     void testFindAllByDateOfCreation() {
         // Arrange
         ZonedDateTime dateOfCreation = ZonedDateTime.now();
-        List<Material> expectedMaterials = new ArrayList<>();
-        expectedMaterials.add(new Material());
-        expectedMaterials.add(new Material());
-        when(materialRepository.findAllByDateOfCreation(dateOfCreation)).thenReturn(expectedMaterials);
+        Page<Material> materials = new PageImpl<>(List.of(new Material()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialRepository.findAllByDateOfCreation(dateOfCreation, pageRequest)).thenReturn(materials);
 
         // Act
-        List<Material> result = materialService.findAllByDateOfCreation(dateOfCreation);
+        Page<Material> result = materialService.findAllByDateOfCreation(dateOfCreation, pageRequest);
 
         // Assert
-        assertEquals(expectedMaterials.size(), result.size());
-        assertEquals(expectedMaterials, result);
+        assertEquals(materials.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materials, result);
     }
 
     @Test
     void testFindAllByOrganization() {
         // Arrange
         Organization organization = new Organization();
-        List<Material> expectedMaterials = new ArrayList<>();
-        expectedMaterials.add(new Material());
-        expectedMaterials.add(new Material());
-        when(materialRepository.findAllByOrganization(organization)).thenReturn(expectedMaterials);
+        Page<Material> materials = new PageImpl<>(List.of(new Material()));
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(materialRepository.findAllByOrganization(organization, pageRequest)).thenReturn(materials);
 
         // Act
-        List<Material> result = materialService.findAllByOrganization(organization);
+        Page<Material> result = materialService.findAllByOrganization(organization, pageRequest);
 
         // Assert
-        assertEquals(expectedMaterials.size(), result.size());
-        assertEquals(expectedMaterials, result);
+        assertEquals(materials.getNumberOfElements(), result.getNumberOfElements());
+        assertEquals(materials, result);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.material.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.material.dto.GetMaterialResponse;
 import com.keepitup.magjobbackend.material.dto.GetMaterialsResponse;
 import com.keepitup.magjobbackend.material.dto.PatchMaterialRequest;
@@ -15,11 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Material Controller")
 public interface MaterialController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Materials")
     @GetMapping("api/materials")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetMaterialsResponse getMaterials();
+    GetMaterialsResponse getMaterials(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Material of given id")
     @GetMapping("api/materials/{id}")
@@ -40,6 +56,18 @@ public interface MaterialController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetMaterialsResponse getMaterialsByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

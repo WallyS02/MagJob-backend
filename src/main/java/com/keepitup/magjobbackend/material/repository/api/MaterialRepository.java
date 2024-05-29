@@ -2,23 +2,24 @@ package com.keepitup.magjobbackend.material.repository.api;
 
 import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public interface MaterialRepository extends JpaRepository<Material, BigInteger> {
     Optional<Material> findByTitle(String title);
 
-    List<Material> findAllByDescription(String description);
+    Page<Material> findAllByDescription(String description, Pageable pageable);
 
-    List<Material> findAllBySize(Long size);
+    Page<Material> findAllBySize(Long size, Pageable pageable);
 
-    List<Material> findAllByContentType(String contentType);
+    Page<Material> findAllByContentType(String contentType, Pageable pageable);
 
-    List<Material> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
+    Page<Material> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
 
-    List<Material> findAllByOrganization(Organization organization);
+    Page<Material> findAllByOrganization(Organization organization, Pageable pageable);
 }

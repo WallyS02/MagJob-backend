@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.material.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.material.dto.GetMaterialResponse;
 import com.keepitup.magjobbackend.material.dto.GetMaterialsResponse;
 import com.keepitup.magjobbackend.material.dto.PatchMaterialRequest;
@@ -15,6 +16,8 @@ import java.math.BigInteger;
 
 @Tag(name="Material Controller")
 public interface MaterialController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Materials")
     @GetMapping("api/materials")
     @ResponseStatus(HttpStatus.OK)

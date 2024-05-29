@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.materialreceiver.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.materialreceiver.dto.GetMaterialReceiverResponse;
 import com.keepitup.magjobbackend.materialreceiver.dto.GetMaterialReceiversResponse;
 import com.keepitup.magjobbackend.materialreceiver.dto.PatchMaterialReceiverRequest;
@@ -15,6 +16,8 @@ import java.math.BigInteger;
 
 @Tag(name="Material Receiver Controller")
 public interface MaterialReceiverController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Material Receivers")
     @GetMapping("api/material-receivers")
     @ResponseStatus(HttpStatus.OK)

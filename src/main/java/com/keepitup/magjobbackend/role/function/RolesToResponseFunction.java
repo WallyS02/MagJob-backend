@@ -2,15 +2,15 @@ package com.keepitup.magjobbackend.role.function;
 
 import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
 import com.keepitup.magjobbackend.role.entity.Role;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
-import java.util.List;
+import java.util.function.BiFunction;
 
 @Component
-public class RolesToResponseFunction implements Function<List<Role>, GetRolesResponse> {
+public class RolesToResponseFunction implements BiFunction<Page<Role>, Integer, GetRolesResponse> {
     @Override
-    public GetRolesResponse apply(List<Role> roles) {
+    public GetRolesResponse apply(Page<Role> roles, Integer count) {
         return GetRolesResponse.builder()
                 .roles(roles.stream()
                         .map(role -> GetRolesResponse.Role.builder()
@@ -20,6 +20,7 @@ public class RolesToResponseFunction implements Function<List<Role>, GetRolesRes
                                 .organizationId(role.getOrganization().getId())
                                 .build())
                         .toList())
+                .count(count)
                 .build();
     }
 }

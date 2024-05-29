@@ -61,7 +61,14 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/material-receivers"),
             new AntPathRequestMatcher("/api/material-receivers/{id}"),
             new AntPathRequestMatcher("/api/materials/{materialId}/material-receivers"),
-            new AntPathRequestMatcher("/api/members/{memberId}/material-receivers")
+            new AntPathRequestMatcher("/api/members/{memberId}/material-receivers"),
+            new AntPathRequestMatcher("/api/roles"),
+            new AntPathRequestMatcher("/api/roles/{id}"),
+            new AntPathRequestMatcher("/api/organizations/{organizationId}/roles"),
+            new AntPathRequestMatcher("/api/role-members"),
+            new AntPathRequestMatcher("/api/role-members/{id}"),
+            new AntPathRequestMatcher("/api/roles/{roleId}/role-members"),
+            new AntPathRequestMatcher("/api/members/{memberId}/role-members")
     };
 
     private final JwtRequestFilter jwtRequestFilter;

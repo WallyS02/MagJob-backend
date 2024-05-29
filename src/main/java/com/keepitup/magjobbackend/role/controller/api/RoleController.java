@@ -19,7 +19,20 @@ public interface RoleController {
     @GetMapping("api/roles")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetRolesResponse getRoles();
+    GetRolesResponse getRoles(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Role of given id")
     @GetMapping("api/roles/{id}")
@@ -40,6 +53,18 @@ public interface RoleController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetRolesResponse getRolesByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

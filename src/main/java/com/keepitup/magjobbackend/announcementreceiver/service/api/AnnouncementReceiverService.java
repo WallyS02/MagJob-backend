@@ -3,6 +3,8 @@ package com.keepitup.magjobbackend.announcementreceiver.service.api;
 import com.keepitup.magjobbackend.announcement.entity.Announcement;
 import com.keepitup.magjobbackend.announcementreceiver.entity.AnnouncementReceiver;
 import com.keepitup.magjobbackend.member.entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,9 +15,11 @@ public interface AnnouncementReceiverService {
 
     List<AnnouncementReceiver> findAll();
 
-    List<AnnouncementReceiver> findAllByMember(Member member);
+    Page<AnnouncementReceiver> findAll(Pageable pageable);
 
-    List<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement);
+    Page<AnnouncementReceiver> findAllByMember(Member member, Pageable pageable);
+
+    Page<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement, Pageable pageable);
 
     Optional<AnnouncementReceiver> findByMemberAndAnnouncement(Member member, Announcement announcement);
 

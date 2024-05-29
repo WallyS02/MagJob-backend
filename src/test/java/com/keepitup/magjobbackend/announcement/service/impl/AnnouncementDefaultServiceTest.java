@@ -8,11 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,17 +91,16 @@ class AnnouncementDefaultServiceTest {
         announcement1.setContent(content);
         Announcement announcement2 = new Announcement();
         announcement2.setContent(content);
-        List<Announcement> announcements = Arrays.asList(announcement1, announcement2);
-        when(announcementRepository.findAllByContent(content)).thenReturn(announcements);
+        Page<Announcement> announcements = new PageImpl<>(List.of(announcement1, announcement2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
+        when(announcementRepository.findAllByContent(content, pageRequest)).thenReturn(announcements);
 
         // Act
-        List<Announcement> result = announcementService.findAllByContent(content);
+        Page<Announcement> result = announcementService.findAllByContent(content, pageRequest);
 
         // Assert
-        assertEquals(announcements.size(), result.size());
-        assertTrue(result.contains(announcement1));
-        assertTrue(result.contains(announcement2));
-        verify(announcementRepository, times(1)).findAllByContent(content);
+        assertEquals(announcements.getNumberOfElements(), result.getNumberOfElements());
+        verify(announcementRepository, times(1)).findAllByContent(content, pageRequest);
     }
 
     @Test
@@ -110,17 +111,16 @@ class AnnouncementDefaultServiceTest {
         announcement1.setDateOfExpiration(expirationDate);
         Announcement announcement2 = new Announcement();
         announcement2.setDateOfExpiration(expirationDate);
-        List<Announcement> announcements = Arrays.asList(announcement1, announcement2);
-        when(announcementRepository.findAllByDateOfExpiration(expirationDate)).thenReturn(announcements);
+        Page<Announcement> announcements = new PageImpl<>(List.of(announcement1, announcement2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
+        when(announcementRepository.findAllByDateOfExpiration(expirationDate, pageRequest)).thenReturn(announcements);
 
         // Act
-        List<Announcement> result = announcementService.findAllByDateOfExpiration(expirationDate);
+        Page<Announcement> result = announcementService.findAllByDateOfExpiration(expirationDate, pageRequest);
 
         // Assert
-        assertEquals(announcements.size(), result.size());
-        assertTrue(result.contains(announcement1));
-        assertTrue(result.contains(announcement2));
-        verify(announcementRepository, times(1)).findAllByDateOfExpiration(expirationDate);
+        assertEquals(announcements.getTotalElements(), result.getTotalElements());
+        verify(announcementRepository, times(1)).findAllByDateOfExpiration(expirationDate, pageRequest);
     }
 
     @Test
@@ -134,18 +134,17 @@ class AnnouncementDefaultServiceTest {
         Announcement announcement2 = new Announcement();
         announcement2.setOrganization(organization);
 
-        List<Announcement> announcements = Arrays.asList(announcement1, announcement2);
+        Page<Announcement> announcements = new PageImpl<>(List.of(announcement1, announcement2));
+        PageRequest pageRequest = PageRequest.of(0, 2);
 
-        when(announcementRepository.findAllByOrganization(organization)).thenReturn(announcements);
+        when(announcementRepository.findAllByOrganization(organization, pageRequest)).thenReturn(announcements);
 
         // Act
-        List<Announcement> result = announcementService.findAllByOrganization(organization);
+        Page<Announcement> result = announcementService.findAllByOrganization(organization, pageRequest);
 
         // Assert
-        assertEquals(announcements.size(), result.size());
-        assertTrue(result.contains(announcement1));
-        assertTrue(result.contains(announcement2));
-        verify(announcementRepository, times(1)).findAllByOrganization(organization);
+        assertEquals(announcements.getNumberOfElements(), result.getNumberOfElements());
+        verify(announcementRepository, times(1)).findAllByOrganization(organization, pageRequest);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.keepitup.magjobbackend.announcement.dto.GetAnnouncementResponse;
 import com.keepitup.magjobbackend.announcement.dto.GetAnnouncementsResponse;
 import com.keepitup.magjobbackend.announcement.dto.PatchAnnouncementRequest;
 import com.keepitup.magjobbackend.announcement.dto.PostAnnouncementRequest;
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Announcement Controller")
 public interface AnnouncementController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Announcements")
     @GetMapping("api/announcements")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetAnnouncementsResponse getAnnouncements();
+    GetAnnouncementsResponse getAnnouncements(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Announcement of given id")
     @GetMapping("api/announcements/{id}")
@@ -40,6 +56,18 @@ public interface AnnouncementController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetAnnouncementsResponse getAnnouncementsByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

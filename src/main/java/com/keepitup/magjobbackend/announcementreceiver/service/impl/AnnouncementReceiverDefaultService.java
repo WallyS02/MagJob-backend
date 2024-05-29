@@ -6,6 +6,8 @@ import com.keepitup.magjobbackend.announcementreceiver.repository.api.Announceme
 import com.keepitup.magjobbackend.announcementreceiver.service.api.AnnouncementReceiverService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -32,13 +34,18 @@ public class AnnouncementReceiverDefaultService implements AnnouncementReceiverS
     }
 
     @Override
-    public List<AnnouncementReceiver> findAllByMember(Member member) {
-        return announcementReceiverRepository.findAllByMember(member);
+    public Page<AnnouncementReceiver> findAll(Pageable pageable) {
+        return announcementReceiverRepository.findAll(pageable);
     }
 
     @Override
-    public List<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement) {
-        return announcementReceiverRepository.findAllByAnnouncement(announcement);
+    public Page<AnnouncementReceiver> findAllByMember(Member member, Pageable pageable) {
+        return announcementReceiverRepository.findAllByMember(member, pageable);
+    }
+
+    @Override
+    public Page<AnnouncementReceiver> findAllByAnnouncement(Announcement announcement, Pageable pageable) {
+        return announcementReceiverRepository.findAllByAnnouncement(announcement, pageable);
     }
 
     @Override

@@ -16,6 +16,8 @@ import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,8 +56,10 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
     }
 
     @Override
-    public GetAnnouncementReceiversResponse getAnnouncementReceivers() {
-        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAll());
+    public GetAnnouncementReceiversResponse getAnnouncementReceivers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = announcementReceiverService.findAll().size();
+        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAll(pageRequest), count);
     }
 
     @Override
@@ -66,23 +70,29 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
     }
 
     @Override
-    public GetAnnouncementReceiversResponse getAnnouncementReceiversByAnnouncement(BigInteger announcementId) {
+    public GetAnnouncementReceiversResponse getAnnouncementReceiversByAnnouncement(int page, int size, BigInteger announcementId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Announcement> announcementOptional = announcementService.find(announcementId);
 
         Announcement announcement = announcementOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAllByAnnouncement(announcement));
+        Integer count = announcementReceiverService.findAllByAnnouncement(announcement, Pageable.unpaged()).getNumberOfElements();
+
+        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAllByAnnouncement(announcement, pageRequest), count);
     }
 
     @Override
-    public GetAnnouncementReceiversResponse getAnnouncementReceiversByMember(BigInteger memberId) {
+    public GetAnnouncementReceiversResponse getAnnouncementReceiversByMember(int page, int size, BigInteger memberId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Member> memberOptional = memberService.find(memberId);
 
         Member member = memberOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAllByMember(member));
+        Integer count = announcementReceiverService.findAllByMember(member, Pageable.unpaged()).getNumberOfElements();
+
+        return announcementReceiversToResponseFunction.apply(announcementReceiverService.findAllByMember(member, pageRequest), count);
     }
 
     @Override

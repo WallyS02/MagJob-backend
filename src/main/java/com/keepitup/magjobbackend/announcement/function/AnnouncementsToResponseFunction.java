@@ -2,15 +2,15 @@ package com.keepitup.magjobbackend.announcement.function;
 
 import com.keepitup.magjobbackend.announcement.dto.GetAnnouncementsResponse;
 import com.keepitup.magjobbackend.announcement.entity.Announcement;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Component
-public class AnnouncementsToResponseFunction implements Function<List<Announcement>, GetAnnouncementsResponse> {
+public class AnnouncementsToResponseFunction implements BiFunction<Page<Announcement>, Integer, GetAnnouncementsResponse> {
     @Override
-    public GetAnnouncementsResponse apply(List<Announcement> announcements) {
+    public GetAnnouncementsResponse apply(Page<Announcement> announcements, Integer count) {
         return GetAnnouncementsResponse.builder()
                 .announcements(announcements.stream()
                         .map(announcement -> GetAnnouncementsResponse.Announcement.builder()
@@ -20,6 +20,7 @@ public class AnnouncementsToResponseFunction implements Function<List<Announceme
                                 .organizationId(announcement.getOrganization().getId())
                                 .build())
                         .toList())
+                .count(count)
                 .build();
     }
 }

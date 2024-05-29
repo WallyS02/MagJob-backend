@@ -37,4 +37,7 @@ public class GetAnnouncementReceiversResponse {
     @Singular
     @Schema(description = "Announcement receiver list")
     private List<GetAnnouncementReceiversResponse.AnnouncementReceiver> announcementReceivers;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

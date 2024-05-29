@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.role.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.role.dto.GetRoleResponse;
 import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
 import com.keepitup.magjobbackend.role.dto.PatchRoleRequest;
@@ -15,6 +16,8 @@ import java.math.BigInteger;
 
 @Tag(name="Role Controller")
 public interface RoleController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all roles")
     @GetMapping("api/roles")
     @ResponseStatus(HttpStatus.OK)

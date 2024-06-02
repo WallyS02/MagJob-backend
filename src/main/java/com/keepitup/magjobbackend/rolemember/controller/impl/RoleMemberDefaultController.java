@@ -11,7 +11,9 @@ import com.keepitup.magjobbackend.rolemember.controller.api.RoleMemberController
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMemberResponse;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMembersResponse;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMemberRequest;
+import com.keepitup.magjobbackend.rolemember.dto.PostRoleMembersRequest;
 import com.keepitup.magjobbackend.rolemember.function.RequestToRoleMemberFunction;
+import com.keepitup.magjobbackend.rolemember.function.RequestToRoleMembersFunction;
 import com.keepitup.magjobbackend.rolemember.function.RoleMemberToResponseFunction;
 import com.keepitup.magjobbackend.rolemember.function.RoleMembersToResponseFunction;
 import com.keepitup.magjobbackend.rolemember.service.impl.RoleMemberDefaultService;
@@ -31,6 +33,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
     private final RoleMemberToResponseFunction roleMemberToResponseFunction;
     private final RoleMembersToResponseFunction roleMembersToResponseFunction;
     private final RequestToRoleMemberFunction requestToRoleMemberFunction;
+    private final RequestToRoleMembersFunction requestToRoleMembersFunction;
     private final SecurityService securityService;
 
     @Autowired
@@ -41,6 +44,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
             RoleMemberToResponseFunction roleMemberToResponseFunction,
             RoleMembersToResponseFunction roleMembersToResponseFunction,
             RequestToRoleMemberFunction requestToRoleMemberFunction,
+            RequestToRoleMembersFunction requestToRoleMembersFunction,
             SecurityService securityService
     ) {
         this.roleMemberService = roleMemberService;
@@ -49,6 +53,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
         this.roleMemberToResponseFunction = roleMemberToResponseFunction;
         this.roleMembersToResponseFunction = roleMembersToResponseFunction;
         this.requestToRoleMemberFunction = requestToRoleMemberFunction;
+        this.requestToRoleMembersFunction = requestToRoleMembersFunction;
         this.securityService = securityService;
     }
 
@@ -124,6 +129,25 @@ public class RoleMemberDefaultController implements RoleMemberController {
                     ))
                 .map(roleMemberToResponseFunction)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @Override
+    public GetRoleMembersResponse createRoleMembers(PostRoleMembersRequest postRoleMembersRequest) {
+        Organization organization = roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getOrganization();
+
+        if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_ROLES)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        roleMemberService.createAll(requestToRoleMembersFunction.apply(postRoleMembersRequest));
+
+        return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(
+                roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                )
+        ));
     }
 
     @Override

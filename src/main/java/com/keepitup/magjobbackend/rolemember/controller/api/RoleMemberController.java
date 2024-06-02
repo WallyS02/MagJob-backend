@@ -3,6 +3,7 @@ package com.keepitup.magjobbackend.rolemember.controller.api;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMemberResponse;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMembersResponse;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMemberRequest;
+import com.keepitup.magjobbackend.rolemember.dto.PostRoleMembersRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,6 +77,23 @@ public interface RoleMemberController {
             @RequestBody
             PostRoleMemberRequest postRoleMemberRequest
     );
+
+    @Operation(summary = "Create Many Role Members")
+    @PostMapping("api/role-members/list")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    GetRoleMembersResponse createRoleMembers(
+            @Parameter(
+                    name = "PostRoleMembersRequest",
+                    description = "PostRoleMembersRequest DTO",
+                    schema = @Schema(implementation = PostRoleMembersRequest.class),
+                    required = true
+            )
+            @RequestBody
+            PostRoleMembersRequest postRoleMembersRequest
+    );
+
+
 
     @Operation(summary = "Delete Role Member")
     @DeleteMapping("/api/role-members/{id}")

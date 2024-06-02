@@ -34,6 +34,18 @@ public class GetRolesResponse {
 
         @Schema(description = "Organization id value")
         private BigInteger organizationId;
+
+        @Schema(description = "Permission to Manage Tasks")
+        private Boolean canManageTasks;
+
+        @Schema(description = "Permission to Manage Announcements")
+        private Boolean canManageAnnouncements;
+
+        @Schema(description = "Permission to Manage Invitations")
+        private Boolean canManageInvitations;
+
+        @Schema(description = "Permission to Manage Roles")
+        private Boolean canManageRoles;
     }
 
     @Singular

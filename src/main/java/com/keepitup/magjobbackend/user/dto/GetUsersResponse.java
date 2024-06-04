@@ -28,9 +28,11 @@ public class GetUsersResponse {
         @Schema(description = "User id value")
         private UUID id;
 
-        @Schema(description = "User email value")
-        private String email;
+        @Schema(description = "User first name value")
+        private String firstName;
 
+        @Schema(description = "User last name value")
+        private String lastName;
     }
 
     @Singular

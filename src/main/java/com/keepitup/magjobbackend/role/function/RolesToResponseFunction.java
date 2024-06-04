@@ -18,6 +18,10 @@ public class RolesToResponseFunction implements Function<List<Role>, GetRolesRes
                                 .name(role.getName())
                                 .externalId(role.getExternalId())
                                 .organizationId(role.getOrganization().getId())
+                                .canManageRoles(role.getCanManageRoles())
+                                .canManageTasks(role.getCanManageTasks())
+                                .canManageInvitations(role.getCanManageInvitations())
+                                .canManageAnnouncements(role.getCanManageAnnouncements())
                                 .build())
                         .toList())
                 .build();

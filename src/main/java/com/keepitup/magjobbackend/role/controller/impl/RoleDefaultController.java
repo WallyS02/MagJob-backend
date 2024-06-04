@@ -1,6 +1,7 @@
 package com.keepitup.magjobbackend.role.controller.impl;
 
 import com.keepitup.magjobbackend.configuration.Constants;
+import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.impl.OrganizationDefaultService;
@@ -15,7 +16,6 @@ import com.keepitup.magjobbackend.role.function.RoleToResponseFunction;
 import com.keepitup.magjobbackend.role.function.RolesToResponseFunction;
 import com.keepitup.magjobbackend.role.function.UpdateRoleWithRequestFunction;
 import com.keepitup.magjobbackend.role.service.impl.RoleDefaultService;
-import com.keepitup.magjobbackend.task.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -32,6 +32,7 @@ public class RoleDefaultController implements RoleController {
     private final RolesToResponseFunction rolesToResponseFunction;
     private final RequestToRoleFunction requestToRoleFunction;
     private final UpdateRoleWithRequestFunction updateRoleWithRequestFunction;
+    private final KeycloakController keycloakController;
     private final SecurityService securityService;
 
     @Autowired
@@ -42,7 +43,7 @@ public class RoleDefaultController implements RoleController {
             RolesToResponseFunction rolesToResponseFunction,
             RequestToRoleFunction requestToRoleFunction,
             UpdateRoleWithRequestFunction updateRoleWithRequestFunction,
-            SecurityService securityService
+            KeycloakController keycloakController, SecurityService securityService
     ) {
         this.roleService = roleService;
         this.organizationService = organizationService;
@@ -50,6 +51,7 @@ public class RoleDefaultController implements RoleController {
         this.rolesToResponseFunction = rolesToResponseFunction;
         this.requestToRoleFunction = requestToRoleFunction;
         this.updateRoleWithRequestFunction = updateRoleWithRequestFunction;
+        this.keycloakController = keycloakController;
         this.securityService = securityService;
     }
 
@@ -107,6 +109,8 @@ public class RoleDefaultController implements RoleController {
 
         roleService.create(requestToRoleFunction.apply(postRoleRequest));
 
+        keycloakController.addChildGroupToKeycloak(organization.getName(), postRoleRequest.getName());
+
         return roleService.findByName(postRoleRequest.getName())
                 .map(roleToResponseFunction)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -144,6 +148,8 @@ public class RoleDefaultController implements RoleController {
         if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_ROLES)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        keycloakController.deleteChildGroupFromKeycloak(organization.getName(), role.getName());
 
         roleService.delete(id);
     }

@@ -1,6 +1,7 @@
 package com.keepitup.magjobbackend.invitation.controller.impl;
 
 import com.keepitup.magjobbackend.configuration.Constants;
+import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.invitation.controller.api.InvitationController;
 import com.keepitup.magjobbackend.invitation.dto.AcceptInvitationRequest;
@@ -44,6 +45,7 @@ public class InvitationDefaultController implements InvitationController {
     private final UserService userService;
     private final OrganizationService organizationService;
     private final MemberToResponseFunction memberToResponse;
+    private final KeycloakController keycloakController;
     private final SecurityService securityService;
 
 
@@ -56,6 +58,7 @@ public class InvitationDefaultController implements InvitationController {
                                        UserService userService,
                                        OrganizationService organizationService,
                                        MemberToResponseFunction memberToResponse,
+                                       KeycloakController keycloakController,
                                        SecurityService securityService
     ) {
         this.service = service;
@@ -66,6 +69,7 @@ public class InvitationDefaultController implements InvitationController {
         this.userService = userService;
         this.organizationService = organizationService;
         this.memberToResponse = memberToResponse;
+        this.keycloakController = keycloakController;
         this.securityService = securityService;
     }
 
@@ -183,6 +187,8 @@ public class InvitationDefaultController implements InvitationController {
                         .organization(organization.get())
                         .user(user.get())
                         .build());
+
+                keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getId());
 
                 service.delete(user.get().getId(), organization.get().getId());
             } else {

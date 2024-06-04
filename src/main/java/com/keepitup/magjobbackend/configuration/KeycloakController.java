@@ -32,7 +32,7 @@ public class KeycloakController {
 
         parentGroupRepresentation.setName(organizationName);
 
-        addGroupToKeycloak(parentGroupRepresentation, keycloak);
+        addParentGroupToKeycloak(parentGroupRepresentation, keycloak);
 
         for (String childGroupName : Constants.DEFAULT_ROLE_NAMES) {
             roleName2ExternalId.put(
@@ -44,11 +44,52 @@ public class KeycloakController {
         return roleName2ExternalId;
     }
 
+    public void addChildGroupToKeycloak(String organizationName, String roleName) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation childGroup = new GroupRepresentation();
+
+        childGroup.setName(roleName);
+
+        GroupRepresentation parentGroup = keycloak.realm(realm).getGroupByPath(organizationName);
+
+        keycloak.realm(realm).groups().group(parentGroup.getId()).subGroup(childGroup);
+    }
+
+    public void deleteChildGroupFromKeycloak(String organizationName, String roleName) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + roleName);
+        try {
+            keycloak.realm(realm).groups().group(groupRepresentation.getId()).remove();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addUserToKeycloakGroup(String organizationName, UUID userId) {
         Keycloak keycloak = keycloakUtil.getKeycloakInstance();
         GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + Constants.ROLE_NAME_MEMBER);
         try {
             keycloak.realm(realm).users().get(String.valueOf(userId)).joinGroup(groupRepresentation.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addUserToKeycloakGroup(String organizationName, UUID userId, String roleName) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + roleName);
+        try {
+            keycloak.realm(realm).users().get(String.valueOf(userId)).joinGroup(groupRepresentation.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeUserFromKeycloakGroup(String organizationName, UUID userId, String roleName) {
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        GroupRepresentation groupRepresentation = keycloak.realm(realm).getGroupByPath(organizationName + "/" + roleName);
+        try {
+            keycloak.realm(realm).users().get(String.valueOf(userId)).leaveGroup(groupRepresentation.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,13 +106,12 @@ public class KeycloakController {
         }
     }
 
-    private void addGroupToKeycloak(GroupRepresentation groupRepresentation, Keycloak keycloak) {
+    private void addParentGroupToKeycloak(GroupRepresentation groupRepresentation, Keycloak keycloak) {
         try (Response response = keycloak.realm(realm).groups().add(groupRepresentation)) {
             String groupId = CreatedResponseUtil.getCreatedId(response);
             groupRepresentation.setId(groupId);
         }
     }
-
     private String addChildGroupToKeycloak(Keycloak keycloak, String parentGroupId, String childGroupName, UUID userId) {
         GroupRepresentation childGroup = new GroupRepresentation();
         String childGroupId;

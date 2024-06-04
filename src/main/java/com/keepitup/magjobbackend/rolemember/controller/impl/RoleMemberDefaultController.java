@@ -1,6 +1,7 @@
 package com.keepitup.magjobbackend.rolemember.controller.impl;
 
 import com.keepitup.magjobbackend.configuration.Constants;
+import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
@@ -15,6 +16,7 @@ import com.keepitup.magjobbackend.rolemember.function.RequestToRoleMemberFunctio
 import com.keepitup.magjobbackend.rolemember.function.RoleMemberToResponseFunction;
 import com.keepitup.magjobbackend.rolemember.function.RoleMembersToResponseFunction;
 import com.keepitup.magjobbackend.rolemember.service.impl.RoleMemberDefaultService;
+import com.keepitup.magjobbackend.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
     private final RoleMemberToResponseFunction roleMemberToResponseFunction;
     private final RoleMembersToResponseFunction roleMembersToResponseFunction;
     private final RequestToRoleMemberFunction requestToRoleMemberFunction;
+    private final KeycloakController keycloakController;
     private final SecurityService securityService;
 
     @Autowired
@@ -41,6 +44,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
             RoleMemberToResponseFunction roleMemberToResponseFunction,
             RoleMembersToResponseFunction roleMembersToResponseFunction,
             RequestToRoleMemberFunction requestToRoleMemberFunction,
+            KeycloakController keycloakController,
             SecurityService securityService
     ) {
         this.roleMemberService = roleMemberService;
@@ -49,6 +53,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
         this.roleMemberToResponseFunction = roleMemberToResponseFunction;
         this.roleMembersToResponseFunction = roleMembersToResponseFunction;
         this.requestToRoleMemberFunction = requestToRoleMemberFunction;
+        this.keycloakController = keycloakController;
         this.securityService = securityService;
     }
 
@@ -109,11 +114,21 @@ public class RoleMemberDefaultController implements RoleMemberController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getOrganization();
 
+        User user = memberService.find(postRoleMemberRequest.getMember()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getUser();
+
+        String roleName = roleService.find(postRoleMemberRequest.getRole()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getName();
+
         if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_ROLES)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         roleMemberService.create(requestToRoleMemberFunction.apply(postRoleMemberRequest));
+
+        keycloakController.addUserToKeycloakGroup(organization.getName(), user.getId(), roleName);
 
         return roleMemberService.findByMemberAndRole(
                     memberService.find(postRoleMemberRequest.getMember()).orElseThrow(
@@ -134,9 +149,19 @@ public class RoleMemberDefaultController implements RoleMemberController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getOrganization();
 
+        User user = roleMemberService.find(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getMember().getUser();
+
+        Role role = roleMemberService.find(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getRole();
+
         if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_ROLES)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        keycloakController.removeUserFromKeycloakGroup(organization.getName(), user.getId(), role.getName());
 
         roleMemberService.find(id)
                 .ifPresentOrElse(

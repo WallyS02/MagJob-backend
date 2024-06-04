@@ -12,8 +12,9 @@ import com.keepitup.magjobbackend.role.function.RoleToResponseFunction;
 import com.keepitup.magjobbackend.role.function.RolesToResponseFunction;
 import com.keepitup.magjobbackend.role.function.UpdateRoleWithRequestFunction;
 import com.keepitup.magjobbackend.role.service.impl.RoleDefaultService;
-import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
@@ -48,8 +49,10 @@ public class RoleDefaultController implements RoleController {
     }
 
     @Override
-    public GetRolesResponse getRoles() {
-        return rolesToResponseFunction.apply(roleService.findAll());
+    public GetRolesResponse getRoles(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = roleService.findAll().size();
+        return rolesToResponseFunction.apply(roleService.findAll(pageRequest), count);
     }
 
     @Override
@@ -60,13 +63,16 @@ public class RoleDefaultController implements RoleController {
     }
 
     @Override
-    public GetRolesResponse getRolesByOrganization(BigInteger organizationId) {
+    public GetRolesResponse getRolesByOrganization(int page, int size, BigInteger organizationId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return rolesToResponseFunction.apply(roleService.findAllByOrganization(organization));
+        Integer count = roleService.findAllByOrganization(organization, Pageable.unpaged()).getNumberOfElements();
+
+        return rolesToResponseFunction.apply(roleService.findAllByOrganization(organization, pageRequest), count);
     }
 
     @Override

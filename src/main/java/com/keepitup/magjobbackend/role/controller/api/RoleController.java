@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.role.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.role.dto.GetRoleResponse;
 import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
 import com.keepitup.magjobbackend.role.dto.PatchRoleRequest;
@@ -15,11 +16,26 @@ import java.math.BigInteger;
 
 @Tag(name="Role Controller")
 public interface RoleController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all roles")
     @GetMapping("api/roles")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetRolesResponse getRoles();
+    GetRolesResponse getRoles(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Role of given id")
     @GetMapping("api/roles/{id}")
@@ -40,6 +56,18 @@ public interface RoleController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetRolesResponse getRolesByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

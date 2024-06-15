@@ -123,18 +123,37 @@ public class OrganizationDefaultController implements OrganizationController {
                 roleName2groupExternalId =
                         keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getId());
 
-                for (String roleName : Constants.DEFAULT_ROLE_NAMES) {
-                    roleService.create(Role.builder()
-                            .name(roleName)
-                            .organization(createdOrganization.get())
-                            .externalId(roleName2groupExternalId.get(roleName))
-                            .canManageTasks(true)
-                            .canManageRoles(true)
-                            .canManageInvitations(true)
-                            .canManageAnnouncements(true)
-                            .isAdmin(true) // TODO delete in future; For testing purposes Owner will be also Admin
-                            .build());
-                }
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_OWNER)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_OWNER))
+                        .canManageTasks(true)
+                        .canManageRoles(true)
+                        .canManageInvitations(true)
+                        .canManageAnnouncements(true)
+                        .isAdmin(true) // TODO delete in future; For testing purposes Owner will be also Admin
+                        .build());
+
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_MODERATOR)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_MODERATOR))
+                        .canManageTasks(true)
+                        .canManageRoles(false)
+                        .canManageInvitations(true)
+                        .canManageAnnouncements(true)
+                        .build());
+
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_MEMBER)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_MEMBER))
+                        .canManageTasks(false)
+                        .canManageRoles(false)
+                        .canManageInvitations(false)
+                        .canManageAnnouncements(false)
+                        .build());
+
 
                 memberService.create(Member.builder()
                         .pseudonym(Constants.ROLE_NAME_OWNER)

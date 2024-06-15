@@ -87,7 +87,7 @@ public interface InvitationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteInvitation(
             @Parameter(
-                    name = "user id",
+                    name = "userId",
                     description = "User id value",
                     required = true
             )

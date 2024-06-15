@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name="Role Member Controller")
 public interface RoleMemberController {
@@ -96,15 +97,22 @@ public interface RoleMemberController {
 
 
     @Operation(summary = "Delete Role Member")
-    @DeleteMapping("/api/role-members/{id}")
+    @DeleteMapping("/api/role-members/{memberId}/{roleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteRoleMember(
             @Parameter(
-                    name = "id",
-                    description = "Role Member id value",
+                    name = "memberId",
+                    description = "Member id value",
                     required = true
             )
-            @PathVariable("id")
-            BigInteger id
+            @PathVariable("memberId")
+            BigInteger memberId,
+            @Parameter(
+                    name = "roleId",
+                    description = "Role id value",
+                    required = true
+            )
+            @PathVariable("roleId")
+            BigInteger roleId
     );
 }

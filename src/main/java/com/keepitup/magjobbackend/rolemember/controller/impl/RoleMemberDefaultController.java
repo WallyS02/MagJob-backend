@@ -166,20 +166,19 @@ public class RoleMemberDefaultController implements RoleMemberController {
     }
 
     @Override
-    public void deleteRoleMember(BigInteger id) {
-        Organization organization = roleService.find(roleMemberService.find(id).orElseThrow(
+    public void deleteRoleMember(BigInteger memberId, BigInteger roleId) {
+        Role role = roleService.find(roleId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        ).getRole().getId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        ).getOrganization();
+        );
 
-        User user = roleMemberService.find(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        ).getMember().getUser();
+        Organization organization = role.getOrganization();
 
-        Role role = roleMemberService.find(id).orElseThrow(
+        Member member = memberService.find(memberId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        ).getRole();
+        );
+
+        User user = member.getUser();
+
 
         if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_ROLES)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -187,9 +186,9 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
         keycloakController.removeUserFromKeycloakGroup(organization.getName(), user.getId(), role.getName());
 
-        roleMemberService.find(id)
+        roleMemberService.findByMemberAndRole(member, role)
                 .ifPresentOrElse(
-                        roleMember -> roleMemberService.delete(id),
+                        roleMember -> roleMemberService.delete(roleMember.getId()),
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }

@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.user.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,13 +17,26 @@ import java.util.UUID;
 
 @Tag(name = "User Controller")
 public interface UserController {
-
+    PageConfig pageConfig = new PageConfig();
 
     @Operation(summary = "Get all Users")
     @GetMapping("api/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetUsersResponse getUsers();
+    GetUsersResponse getUsers(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get User")
     @GetMapping("/api/users/{id}")

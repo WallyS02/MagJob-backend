@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.organization.entity;
 
 import com.keepitup.magjobbackend.announcement.entity.Announcement;
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
+import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.role.entity.Role;
 import com.keepitup.magjobbackend.task.entity.Task;
@@ -37,9 +38,9 @@ public class Organization {
     @Column(name = "date_of_creation")
     private ZonedDateTime dateOfCreation;
 
-    @URL
-    @Column(name = "profile_banner_url", length = 50)
-    private String profileBannerUrl;
+    @Lob
+    @Column(name = "banner", length = 1000)
+    private byte[] banner;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
     private List<Member> members;
@@ -55,4 +56,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "organization")
+    private List<Material> materials;
 }

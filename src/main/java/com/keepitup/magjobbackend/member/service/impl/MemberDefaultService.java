@@ -8,10 +8,11 @@ import com.keepitup.magjobbackend.organization.repository.api.OrganizationReposi
 import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.repository.api.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,8 +31,8 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public List<Member> findAllByIsStillMember(Boolean isStillMember) {
-        return memberRepository.findAllByIsStillMember(isStillMember);
+    public Page<Member> findAllByIsStillMember(Boolean isStillMember, Pageable pageable) {
+        return memberRepository.findAllByIsStillMember(isStillMember, pageable);
     }
 
     @Override
@@ -45,18 +46,18 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public List<Member> findAllByPseudonym(String pseudonym) {
-        return memberRepository.findAllByPseudonym(pseudonym);
+    public Page<Member> findAllByPseudonym(String pseudonym, Pageable pageable) {
+        return memberRepository.findAllByPseudonym(pseudonym, pageable);
     }
 
     @Override
-    public List<Member> findAllByOrganization(Organization organization) {
-        return memberRepository.findAllByOrganization(organization);
+    public Page<Member> findAllByOrganization(Organization organization, Pageable pageable) {
+        return memberRepository.findAllByOrganization(organization, pageable);
     }
 
     @Override
-    public List<Member> findAllByOrganizationAndIsStillMember(Organization organization, Boolean isStillMember) {
-        return memberRepository.findAllByOrganizationAndIsStillMember(organization, isStillMember);
+    public Page<Member> findAllByOrganizationAndIsStillMember(Organization organization, Boolean isStillMember, Pageable pageable) {
+        return memberRepository.findAllByOrganizationAndIsStillMember(organization, isStillMember, pageable);
     }
 
     @Override
@@ -66,30 +67,17 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public Optional<List<User>> findAllUsersByOrganization(BigInteger organizationId) {
+    public Optional<Page<User>> findAllUsersByOrganization(BigInteger organizationId, Pageable pageable) {
         return organizationRepository.findById(organizationId)
-                .map(memberRepository::findAllByOrganization)
-                .map(members -> members.stream()
-                        .map(Member::getUser)
-                        .collect(Collectors.toList()));
+                .map(organization -> memberRepository.findAllByOrganization(organization, pageable))
+                .map(members -> members.map(Member::getUser));
     }
 
     @Override
-    public Optional<List<Organization>> findAllOrganizationsByUser(UUID userId) {
+    public Optional<Page<Organization>> findAllOrganizationsByUser(UUID userId, Pageable pageable) {
         return userRepository.findById(userId)
-                .map(memberRepository::findAllByUser)
-                .map(members -> members.stream()
-                        .map(Member::getOrganization)
-                        .collect(Collectors.toList()));
-    }
-
-    @Override
-    public Optional<List<Organization>> findAllOrganizationsByUserId(UUID userId) {
-        return userRepository.findById(userId)
-                .map(memberRepository::findAllByUser)
-                .map(members -> members.stream()
-                        .map(Member::getOrganization)
-                        .collect(Collectors.toList()));
+                .map(user -> memberRepository.findAllByUser(user, pageable))
+                .map(members -> members.map(Member::getOrganization));
     }
 
     @Override

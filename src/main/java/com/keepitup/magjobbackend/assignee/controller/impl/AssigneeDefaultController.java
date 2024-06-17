@@ -15,6 +15,8 @@ import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.task.entity.Task;
 import com.keepitup.magjobbackend.task.service.api.TaskService;
 import lombok.extern.java.Log;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -90,7 +92,7 @@ public class AssigneeDefaultController implements AssigneeController {
     }
 
     @Override
-    public GetAssigneesResponse getAssigneesByTask(BigInteger taskId) {
+    public GetAssigneesResponse getAssigneesByTask(int page, int size, BigInteger taskId) {
         Organization organization = taskService.find(taskId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getOrganization();
@@ -98,11 +100,14 @@ public class AssigneeDefaultController implements AssigneeController {
         if(!securityService.belongsToOrganization(organization)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
+  
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Task> task = taskService.find(taskId);
 
+        Integer count = service.findAllByTask(task.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)), Pageable.unpaged()).getNumberOfElements();
+
         return assigneesToResponse.apply(
-                service.findAllByTask(task.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                service.findAllByTask(task.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)), pageRequest), count
         );
     }
 

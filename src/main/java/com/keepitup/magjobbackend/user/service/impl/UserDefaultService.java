@@ -4,6 +4,8 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.repository.api.UserRepository;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,11 @@ public class UserDefaultService implements UserService {
     }
 
     @Override
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<User> find(UUID id) {
         return userRepository.findById(id);
     }
@@ -38,18 +45,18 @@ public class UserDefaultService implements UserService {
     }
 
     @Override
-    public List<User> findAllByFirstname(String firstname) {
-        return userRepository.findAllByFirstname(firstname);
+    public Page<User> findAllByFirstname(String firstname, Pageable pageable) {
+        return userRepository.findAllByFirstname(firstname, pageable);
     }
 
     @Override
-    public List<User> findAllByLastname(String lastname) {
-        return userRepository.findAllByLastname(lastname);
+    public Page<User> findAllByLastname(String lastname, Pageable pageable) {
+        return userRepository.findAllByLastname(lastname, pageable);
     }
 
     @Override
-    public List<User> findAllByFirstnameAndLastname(String firstname, String lastname) {
-        return userRepository.findAllByFirstnameAndLastname(firstname, lastname);
+    public Page<User> findAllByFirstnameAndLastname(String firstname, String lastname, Pageable pageable) {
+        return userRepository.findAllByFirstnameAndLastname(firstname, lastname, pageable);
     }
 
     @Override

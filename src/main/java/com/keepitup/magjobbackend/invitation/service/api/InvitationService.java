@@ -1,6 +1,8 @@
 package com.keepitup.magjobbackend.invitation.service.api;
 
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
@@ -11,17 +13,17 @@ import java.util.UUID;
 
 public interface InvitationService {
 
-    Optional<List<Invitation>> findAllByUser(UUID userId);
+    Optional<Page<Invitation>> findAllByUser(UUID userId, Pageable pageable);
 
-    Optional<List<Invitation>> findAllByUserAndIsActive(UUID userId, Boolean isActive);
+    Optional<Page<Invitation>> findAllByUserAndIsActive(UUID userId, Boolean isActive, Pageable pageable);
 
-    Optional<List<Invitation>> findAllByOrganization(BigInteger organizationId);
+    Optional<Page<Invitation>> findAllByOrganization(BigInteger organizationId, Pageable pageable);
 
-    Optional<List<Invitation>> findAllByOrganizationAndIsActive(BigInteger organizationId, Boolean isActive);
+    Optional<Page<Invitation>> findAllByOrganizationAndIsActive(BigInteger organizationId, Boolean isActive, Pageable pageable);
 
     Optional<Invitation> findByUserAndOrganization(UUID userId, BigInteger organizationId);
 
-    List<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
+    Page<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
 
     void create(Invitation invitation);
 

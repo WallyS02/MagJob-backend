@@ -8,12 +8,13 @@ import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.repository.api.MemberRepository;
 import com.keepitup.magjobbackend.task.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AssigneeDefaultService implements AssigneeService {
@@ -36,6 +37,11 @@ public class AssigneeDefaultService implements AssigneeService {
     }
 
     @Override
+    public Page<Assignee> findAll(Pageable pageable) {
+        return assigneeRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Assignee> find(AssigneeId id) {
         return assigneeRepository.findById(id);
     }
@@ -46,13 +52,13 @@ public class AssigneeDefaultService implements AssigneeService {
     }
 
     @Override
-    public List<Assignee> findAllByMember(Member member) {
-        return assigneeRepository.findAllByMember(member);
+    public Page<Assignee> findAllByMember(Member member, Pageable pageable) {
+        return assigneeRepository.findAllByMember(member, pageable);
     }
 
     @Override
-    public List<Assignee> findAllByTask(Task task) {
-        return assigneeRepository.findAllByTask(task);
+    public Page<Assignee> findAllByTask(Task task, Pageable pageable) {
+        return assigneeRepository.findAllByTask(task, pageable);
     }
 
     @Override
@@ -76,11 +82,9 @@ public class AssigneeDefaultService implements AssigneeService {
     }
 
     @Override
-    public Optional<List<Task>> findAllTasksByMember(BigInteger memberId) {
+    public Optional<Page<Task>> findAllTasksByMember(BigInteger memberId, Pageable pageable) {
         return memberRepository.findById(memberId)
-                .map(assigneeRepository::findAllByMember)
-                .map(assignees -> assignees.stream()
-                        .map(Assignee::getTask)
-                        .collect(Collectors.toList()));
+                .map(member -> assigneeRepository.findAllByMember(member, pageable))
+                .map(assignees -> assignees.map(Assignee::getTask));
     }
 }

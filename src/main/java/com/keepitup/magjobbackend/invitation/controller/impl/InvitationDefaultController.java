@@ -24,6 +24,9 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,21 +91,31 @@ public class InvitationDefaultController implements InvitationController {
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByUser(UUID userId) {
+    public GetInvitationsResponse getInvitationsByUser(int page, int size, UUID userId) {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
         UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
 
         if (!loggedInUserId.equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+  
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        return service.findAllByUserAndIsActive(userId, true)
-                .map(invitationsToResponse)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Optional<Page<Invitation>> countOptional = service.findAllByUserAndIsActive(userId, true, Pageable.unpaged());
+        if (countOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Integer count = countOptional.get().getNumberOfElements();
+
+        Optional<Page<Invitation>> invitations = service.findAllByUserAndIsActive(userId, true, pageRequest);
+        if (invitations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return invitationsToResponse.apply(invitations.get(), count);
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByOrganization(BigInteger organizationId) {
+    public GetInvitationsResponse getInvitationsByOrganization(int page, int size, BigInteger organizationId) {
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
 
         Organization organization = organizationOptional
@@ -111,10 +124,20 @@ public class InvitationDefaultController implements InvitationController {
         if(!securityService.belongsToOrganization(organization)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+      
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        return service.findAllByOrganizationAndIsActive(organizationId, true)
-                .map(invitationsToResponse)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Optional<Page<Invitation>> countOptional = service.findAllByOrganizationAndIsActive(organizationId, true, Pageable.unpaged());
+        if (countOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Integer count = countOptional.get().getNumberOfElements();
+
+        Optional<Page<Invitation>> invitations = service.findAllByOrganizationAndIsActive(organizationId, true, pageRequest);
+        if (invitations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return invitationsToResponse.apply(invitations.get(), count);
     }
 
     @Override

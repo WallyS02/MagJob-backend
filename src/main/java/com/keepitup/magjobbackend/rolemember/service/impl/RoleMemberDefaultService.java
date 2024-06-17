@@ -6,6 +6,8 @@ import com.keepitup.magjobbackend.rolemember.entity.RoleMember;
 import com.keepitup.magjobbackend.rolemember.repository.api.RoleMemberRepository;
 import com.keepitup.magjobbackend.rolemember.service.api.RoleMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -37,13 +39,18 @@ public class RoleMemberDefaultService implements RoleMemberService {
     }
 
     @Override
-    public List<RoleMember> findAllByMember(Member member) {
-        return roleMemberRepository.findAllByMember(member);
+    public Page<RoleMember> findAll(Pageable pageable) {
+        return roleMemberRepository.findAll(pageable);
     }
 
     @Override
-    public List<RoleMember> findAllByRole(Role role) {
-        return roleMemberRepository.findAllByRole(role);
+    public Page<RoleMember> findAllByMember(Member member, Pageable pageable) {
+        return roleMemberRepository.findAllByMember(member, pageable);
+    }
+
+    @Override
+    public Page<RoleMember> findAllByRole(Role role, Pageable pageable) {
+        return roleMemberRepository.findAllByRole(role, pageable);
     }
 
     @Override

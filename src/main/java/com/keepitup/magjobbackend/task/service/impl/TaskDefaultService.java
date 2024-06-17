@@ -5,6 +5,8 @@ import com.keepitup.magjobbackend.task.entity.Task;
 import com.keepitup.magjobbackend.task.repository.api.TaskRepository;
 import com.keepitup.magjobbackend.task.service.api.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -27,6 +29,11 @@ public class TaskDefaultService implements TaskService {
     }
 
     @Override
+    public Page<Task> findAll(Pageable pageable) {
+        return taskRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Task> find(BigInteger id) {
         return taskRepository.findById(id);
     }
@@ -37,38 +44,38 @@ public class TaskDefaultService implements TaskService {
     }
 
     @Override
-    public List<Task> findAllByOrganization(Organization organization) {
-        return taskRepository.findAllByOrganization(organization);
+    public Page<Task> findAllByOrganization(Organization organization, Pageable pageable) {
+        return taskRepository.findAllByOrganization(organization ,pageable);
     }
 
     @Override
-    public List<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation) {
-        return taskRepository.findAllByDateOfCreation(dateOfCreation);
+    public Page<Task> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable) {
+        return taskRepository.findAllByDateOfCreation(dateOfCreation, pageable);
     }
 
     @Override
-    public List<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion) {
-        return taskRepository.findAllByDateOfCompletion(dateOfCompletion);
+    public Page<Task> findAllByDateOfCompletion(ZonedDateTime dateOfCompletion, Pageable pageable) {
+        return taskRepository.findAllByDateOfCompletion(dateOfCompletion, pageable);
     }
 
     @Override
-    public List<Task> findAllByIsDone(Boolean isDone) {
-        return taskRepository.findAllByIsDone(isDone);
+    public Page<Task> findAllByIsDone(Boolean isDone, Pageable pageable) {
+        return taskRepository.findAllByIsDone(isDone, pageable);
     }
 
     @Override
-    public List<Task> findAllByDescription(String description) {
-        return taskRepository.findAllByDescription(description);
+    public Page<Task> findAllByDescription(String description, Pageable pageable) {
+        return taskRepository.findAllByDescription(description, pageable);
     }
 
     @Override
-    public List<Task> findAllByIsImportant(Boolean isImportant) {
-        return taskRepository.findAllByIsImportant(isImportant);
+    public Page<Task> findAllByIsImportant(Boolean isImportant, Pageable pageable) {
+        return taskRepository.findAllByIsImportant(isImportant, pageable);
     }
 
     @Override
-    public List<Task> findAllByDeadLine(ZonedDateTime deadLine) {
-        return taskRepository.findAllByDeadLine(deadLine);
+    public Page<Task> findAllByDeadLine(ZonedDateTime deadLine, Pageable pageable) {
+        return taskRepository.findAllByDeadLine(deadLine, pageable);
     }
 
     @Override

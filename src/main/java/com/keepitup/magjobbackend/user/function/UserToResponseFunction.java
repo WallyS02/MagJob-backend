@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.user.function;
 
 import com.keepitup.magjobbackend.user.dto.GetUserResponse;
 import com.keepitup.magjobbackend.user.entity.User;
+import com.keepitup.magjobbackend.user.utils.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
@@ -18,6 +19,7 @@ public class UserToResponseFunction implements Function<User, GetUserResponse> {
                 .lastname(user.getLastname())
                 .phoneNumber(user.getPhoneNumber())
                 .birthDate(user.getBirthDate())
+                .image(ImageUtil.decompressImage(user.getImage()))
                 .build();
     }
 }

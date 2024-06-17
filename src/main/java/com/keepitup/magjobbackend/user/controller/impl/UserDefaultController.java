@@ -9,6 +9,7 @@ import com.keepitup.magjobbackend.user.function.*;
 import com.keepitup.magjobbackend.user.service.impl.UserDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,8 +48,10 @@ public class UserDefaultController implements UserController {
     }
 
     @Override
-    public GetUsersResponse getUsers() {
-        return usersToResponse.apply(service.findAll());
+    public GetUsersResponse getUsers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = service.findAll().size();
+        return usersToResponse.apply(service.findAll(pageRequest), count);
     }
 
     @Override

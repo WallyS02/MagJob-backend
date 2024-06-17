@@ -3,6 +3,8 @@ package com.keepitup.magjobbackend.rolemember.service.api;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.role.entity.Role;
 import com.keepitup.magjobbackend.rolemember.entity.RoleMember;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,9 +18,11 @@ public interface RoleMemberService {
 
     List<RoleMember> findAll();
 
-    List<RoleMember> findAllByMember(Member member);
+    Page<RoleMember> findAll(Pageable pageable);
 
-    List<RoleMember> findAllByRole(Role role);
+    Page<RoleMember> findAllByMember(Member member, Pageable pageable);
+
+    Page<RoleMember> findAllByRole(Role role, Pageable pageable);
 
     void create(RoleMember roleMember);
 

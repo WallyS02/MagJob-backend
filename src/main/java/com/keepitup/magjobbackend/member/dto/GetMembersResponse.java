@@ -47,4 +47,6 @@ public class GetMembersResponse {
     @Schema(description = "Member list")
     private List<Member> members;
 
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

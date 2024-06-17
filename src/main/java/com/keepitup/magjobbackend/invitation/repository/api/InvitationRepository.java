@@ -3,21 +3,22 @@ package com.keepitup.magjobbackend.invitation.repository.api;
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface InvitationRepository extends JpaRepository<Invitation, BigInteger> {
-    List<Invitation> findAllByUser(User user);
-    List<Invitation> findAllByUserAndIsActive(User user, Boolean isActive);
-    List<Invitation> findAllByOrganization(Organization organization);
-    List<Invitation> findAllByOrganizationAndIsActive(Organization organization, Boolean isActive);
-    List<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
-    Optional<Invitation> findByUserIdAndOrganizationId(UUID userId, BigInteger organizationId);
+    Page<Invitation> findAllByUser(User user, Pageable pageable);
+    Page<Invitation> findAllByUserAndIsActive(User user, Boolean isActive, Pageable pageable);
+    Page<Invitation> findAllByOrganization(Organization organization, Pageable pageable);
+    Page<Invitation> findAllByOrganizationAndIsActive(Organization organization, Boolean isActive, Pageable pageable);
+    Page<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
+    Optional<Invitation> findByUser_IdAndOrganization_Id(UUID userId, BigInteger organizationId);
 }

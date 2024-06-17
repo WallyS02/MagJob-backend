@@ -39,13 +39,25 @@ public interface InvitationController {
             BigInteger organizationId
     );
 
-    @Operation(summary = "Get Invitation By User")
+    @Operation(summary = "Get Invitations By User")
     @GetMapping("/api/users/{userId}/invitations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByUser(
             @Parameter(
-                    name = "user id",
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
+                    name = "userId",
                     description = "User id value",
                     required = true
             )
@@ -58,6 +70,18 @@ public interface InvitationController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetInvitationsResponse getInvitationsByOrganization(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",

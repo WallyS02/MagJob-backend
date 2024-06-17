@@ -40,4 +40,7 @@ public class GetAnnouncementsResponse {
     @Singular
     @Schema(description = "Announcement list")
     private List<GetAnnouncementsResponse.Announcement> announcements;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

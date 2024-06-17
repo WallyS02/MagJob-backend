@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.user.function;
 
 import com.keepitup.magjobbackend.user.dto.PatchUserRequest;
 import com.keepitup.magjobbackend.user.entity.User;
+import com.keepitup.magjobbackend.user.utils.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.function.BiFunction;
@@ -17,6 +18,7 @@ public class UpdateUserWithRequestFunction implements BiFunction<User, PatchUser
                 .lastname(request.getLastname())
                 .phoneNumber(request.getPhoneNumber())
                 .birthDate(request.getBirthDate())
+                .image(ImageUtil.compressImage(request.getImage()))
                 .build();
     }
 }

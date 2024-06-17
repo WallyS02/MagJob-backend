@@ -19,6 +19,9 @@ import com.keepitup.magjobbackend.user.entity.User;
 import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,8 +76,10 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizations() {
-        return organizationsToResponse.apply(service.findAll());
+    public GetOrganizationsResponse getOrganizations(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = service.findAll().size();
+        return organizationsToResponse.apply(service.findAll(pageRequest), count);
     }
 
     @Override
@@ -92,20 +97,26 @@ public class OrganizationDefaultController implements OrganizationController {
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizationsByUser(UUID userId) {
+    public GetOrganizationsResponse getOrganizationsByUser(int page, int size, UUID userId) {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
         UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
 
         if (!loggedInUserId.equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+  
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUserId(userId);
+        Optional<Page<Organization>> countOptional = memberService.findAllOrganizationsByUser(userId, Pageable.unpaged());
+        Integer count = countOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getNumberOfElements();
 
-        List<Organization> organizations = organizationsOptional
+        Optional<Page<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(userId, pageRequest);
+
+        Page<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return organizationsToResponse.apply(organizations);
+        return organizationsToResponse.apply(organizations, count);
     }
 
     @Override

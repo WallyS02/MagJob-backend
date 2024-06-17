@@ -6,6 +6,8 @@ import com.keepitup.magjobbackend.organization.service.api.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -26,6 +28,11 @@ public class OrganizationDefaultService implements OrganizationService {
     }
 
     @Override
+    public Page<Organization> findAll(Pageable pageable) {
+        return organizationRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Organization> find(BigInteger id) {
         return organizationRepository.findById(id);
     }
@@ -36,8 +43,8 @@ public class OrganizationDefaultService implements OrganizationService {
     }
 
     @Override
-    public List<Organization> findAllByDateOfCreation(ZonedDateTime dateOfCreation) {
-        return organizationRepository.findAllByDateOfCreation(dateOfCreation);
+    public Page<Organization> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable) {
+        return organizationRepository.findAllByDateOfCreation(dateOfCreation, pageable);
     }
 
     @Override

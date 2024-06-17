@@ -29,4 +29,6 @@ public class PatchUserRequest {
     @Schema(description = "User birth date value")
     private LocalDate birthDate;
 
+    @Schema(description = "User image")
+    private byte[] image;
 }

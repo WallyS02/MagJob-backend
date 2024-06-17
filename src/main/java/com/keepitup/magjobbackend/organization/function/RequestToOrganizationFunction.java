@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.organization.function;
 
 import com.keepitup.magjobbackend.organization.dto.PostOrganizationRequest;
 import com.keepitup.magjobbackend.organization.entity.Organization;
+import com.keepitup.magjobbackend.user.utils.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -13,7 +14,7 @@ public class RequestToOrganizationFunction implements Function<PostOrganizationR
     public Organization apply(PostOrganizationRequest request) {
         return Organization.builder()
                 .name(request.getName())
-                .profileBannerUrl(request.getProfileBannerUrl())
+                .banner(ImageUtil.compressImage(request.getBanner()))
                 .build();
     }
 }

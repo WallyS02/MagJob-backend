@@ -51,4 +51,7 @@ public class GetRolesResponse {
     @Singular
     @Schema(description = "Role list")
     private List<Role> roles;
+
+    @Schema(description = "Number of all objects")
+    private Integer count;
 }

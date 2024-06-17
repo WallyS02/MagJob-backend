@@ -20,6 +20,8 @@ import com.keepitup.magjobbackend.rolemember.function.RoleMembersToResponseFunct
 import com.keepitup.magjobbackend.rolemember.service.impl.RoleMemberDefaultService;
 import com.keepitup.magjobbackend.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,11 +65,14 @@ public class RoleMemberDefaultController implements RoleMemberController {
     }
 
     @Override
-    public GetRoleMembersResponse getRoleMembers() {
+    public GetRoleMembersResponse getRoleMembers(int page, int size) {
         if (!securityService.hasAdminPermission()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return roleMembersToResponseFunction.apply(roleMemberService.findAll());
+  
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Integer count = roleMemberService.findAll().size();
+        return roleMembersToResponseFunction.apply(roleMemberService.findAll(pageRequest), count);
     }
 
     @Override
@@ -82,7 +87,8 @@ public class RoleMemberDefaultController implements RoleMemberController {
     }
 
     @Override
-    public GetRoleMembersResponse getRoleMembersByRole(BigInteger roleId) {
+    public GetRoleMembersResponse getRoleMembersByRole(int page, int size, BigInteger roleId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Role> roleOptional = roleService.find(roleId);
 
         Role role = roleOptional
@@ -94,11 +100,14 @@ public class RoleMemberDefaultController implements RoleMemberController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(role));
+        Integer count = roleMemberService.findAllByRole(role, Pageable.unpaged()).getNumberOfElements();
+
+        return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(role, pageRequest), count);
     }
 
     @Override
-    public GetRoleMembersResponse getRoleMembersByMember(BigInteger memberId) {
+    public GetRoleMembersResponse getRoleMembersByMember(int page, int size, BigInteger memberId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Member> memberOptional = memberService.find(memberId);
 
         Member member = memberOptional
@@ -110,7 +119,9 @@ public class RoleMemberDefaultController implements RoleMemberController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        return roleMembersToResponseFunction.apply(roleMemberService.findAllByMember(member));
+        Integer count = roleMemberService.findAllByMember(member, Pageable.unpaged()).getNumberOfElements();
+
+        return roleMembersToResponseFunction.apply(roleMemberService.findAllByMember(member, pageRequest), count);
     }
 
     @Override

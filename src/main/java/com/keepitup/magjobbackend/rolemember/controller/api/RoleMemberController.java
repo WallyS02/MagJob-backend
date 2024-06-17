@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.rolemember.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMemberResponse;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMembersResponse;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMemberRequest;
@@ -16,11 +17,26 @@ import java.util.UUID;
 
 @Tag(name="Role Member Controller")
 public interface RoleMemberController {
+    PageConfig pageConfig = new PageConfig();
+
     @Operation(summary = "Get all Role Members")
     @GetMapping("api/role-members")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetRoleMembersResponse getRoleMembers();
+    GetRoleMembersResponse getRoleMembers(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Role Member of given id")
     @GetMapping("api/role-members/{id}")
@@ -42,6 +58,18 @@ public interface RoleMemberController {
     @ResponseBody
     GetRoleMembersResponse getRoleMembersByRole(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "roleId",
                     description = "Role id value",
                     required = true
@@ -55,6 +83,18 @@ public interface RoleMemberController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetRoleMembersResponse getRoleMembersByMember(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
             @Parameter(
                     name = "memberId",
                     description = "Member id value",

@@ -16,7 +16,7 @@ public class AnnouncementToResponseFunction implements Function<Announcement, Ge
                 .title(announcement.getTitle())
                 .content(announcement.getContent())
                 .dateOfExpiration(announcement.getDateOfExpiration())
-                .organization(GetMemberResponse.Organization.builder()
+                .organization(GetAnnouncementResponse.Organization.builder()
                         .id(announcement.getOrganization().getId())
                         .name(announcement.getOrganization().getName())
                         .build())

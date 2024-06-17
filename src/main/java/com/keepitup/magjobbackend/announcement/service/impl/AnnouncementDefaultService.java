@@ -5,6 +5,8 @@ import com.keepitup.magjobbackend.announcement.repository.api.AnnouncementReposi
 import com.keepitup.magjobbackend.announcement.service.api.AnnouncementService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -32,23 +34,28 @@ public class AnnouncementDefaultService implements AnnouncementService {
     }
 
     @Override
+    public Page<Announcement> findAll(Pageable pageable) {
+        return announcementRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<Announcement> findByTitle(String title) {
         return announcementRepository.findByTitle(title);
     }
 
     @Override
-    public List<Announcement> findAllByContent(String content) {
-        return announcementRepository.findAllByContent(content);
+    public Page<Announcement> findAllByContent(String content, Pageable pageable) {
+        return announcementRepository.findAllByContent(content, pageable);
     }
 
     @Override
-    public List<Announcement> findAllByDateOfExpiration(ZonedDateTime dateOfExpiration) {
-        return announcementRepository.findAllByDateOfExpiration(dateOfExpiration);
+    public Page<Announcement> findAllByDateOfExpiration(ZonedDateTime dateOfExpiration, Pageable pageable) {
+        return announcementRepository.findAllByDateOfExpiration(dateOfExpiration, pageable);
     }
 
     @Override
-    public List<Announcement> findAllByOrganization(Organization organization) {
-        return announcementRepository.findAllByOrganization(organization);
+    public Page<Announcement> findAllByOrganization(Organization organization, Pageable pageable) {
+        return announcementRepository.findAllByOrganization(organization, pageable);
     }
 
     @Override

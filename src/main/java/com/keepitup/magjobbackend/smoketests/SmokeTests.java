@@ -195,7 +195,7 @@ public class SmokeTests {
 
         PostOrganizationRequest postOrganizationRequest = new PostOrganizationRequest();
         postOrganizationRequest.setName(ORGANIZATION_NAME_TEST_VALUE);
-        postOrganizationRequest.setProfileBannerUrl(ORGANIZATION_PROFILE_BANNER_URL_TEST_VALUE);
+        //postOrganizationRequest.setProfileBannerUrl(ORGANIZATION_PROFILE_BANNER_URL_TEST_VALUE);
         postOrganizationRequest.setUser(testUserId);
 
         HttpEntity<PostOrganizationRequest> requestEntity = new HttpEntity<>(postOrganizationRequest, entity.getHeaders());
@@ -216,7 +216,7 @@ public class SmokeTests {
 
         PatchOrganizationRequest patchOrganizationRequest = new PatchOrganizationRequest();
         patchOrganizationRequest.setName(ORGANIZATION_NAME_UPDATED_TEST_VALUE);
-        patchOrganizationRequest.setProfileBannerUrl(ORGANIZATION_PROFILE_BANNER_URL_UPDATED_TEST_VALUE);
+        //patchOrganizationRequest.setProfileBannerUrl(ORGANIZATION_PROFILE_BANNER_URL_UPDATED_TEST_VALUE);
 
         HttpEntity<PatchOrganizationRequest> requestEntity = new HttpEntity<>(patchOrganizationRequest, entity.getHeaders());
 

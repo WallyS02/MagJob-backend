@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.organization.controller.api;
 
+import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.organization.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,13 +14,26 @@ import java.util.UUID;
 
 @Tag(name="Organization Controller")
 public interface OrganizationController {
-
+    PageConfig pageConfig = new PageConfig();
 
     @Operation(summary = "Get all Organizations")
     @GetMapping("api/organizations")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetOrganizationsResponse getOrganizations();
+    GetOrganizationsResponse getOrganizations(
+            @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size
+    );
 
     @Operation(summary = "Get Organizations By User id")
     @GetMapping("api/organizations/users/{id}")
@@ -27,12 +41,24 @@ public interface OrganizationController {
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
             @Parameter(
+                    name = "page number",
+                    description = "Page number to retrieve"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.number}")
+            int page,
+            @Parameter(
+                    name = "page size",
+                    description = "Number of records per page"
+            )
+            @RequestParam(defaultValue = "#{pageConfig.size}")
+            int size,
+            @Parameter(
                     name = "user id",
                     description = "User id value",
                     required = true
             )
             @PathVariable("id")
-            UUID id
+            UUID userId
     );
 
     @Operation(summary = "Get Organization")

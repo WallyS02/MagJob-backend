@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -24,7 +26,7 @@ public class GetMemberResponse {
     public static class User {
 
         @Schema(description = "User id  value")
-        private BigInteger id;
+        private UUID id;
 
         @Schema(description = "User email  value")
         private String email;

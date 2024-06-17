@@ -1,7 +1,6 @@
 package com.keepitup.magjobbackend.organization.controller.api;
 
 import com.keepitup.magjobbackend.organization.dto.*;
-import com.keepitup.magjobbackend.user.dto.PutPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name="Organization Controller")
 public interface OrganizationController {
@@ -21,18 +21,18 @@ public interface OrganizationController {
     @ResponseBody
     GetOrganizationsResponse getOrganizations();
 
-    @Operation(summary = "Get Organizations By User")
-    @GetMapping("api/organizations/users/{userId}")
+    @Operation(summary = "Get Organizations By User id")
+    @GetMapping("api/organizations/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
             @Parameter(
-                    name = "id",
+                    name = "user id",
                     description = "User id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger id
+            @PathVariable("id")
+            UUID id
     );
 
     @Operation(summary = "Get Organization")

@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface InvitationRepository extends JpaRepository<Invitation, BigInteger> {
@@ -18,5 +19,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, BigInteg
     List<Invitation> findAllByOrganization(Organization organization);
     List<Invitation> findAllByOrganizationAndIsActive(Organization organization, Boolean isActive);
     List<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
-    Optional<Invitation> findByUser_IdAndOrganization_Id(BigInteger userId, BigInteger organizationId);
+    Optional<Invitation> findByUserIdAndOrganizationId(UUID userId, BigInteger organizationId);
 }

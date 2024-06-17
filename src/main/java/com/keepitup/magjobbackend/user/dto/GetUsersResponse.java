@@ -3,8 +3,9 @@ package com.keepitup.magjobbackend.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.util.List;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -25,11 +26,13 @@ public class GetUsersResponse {
     public static class User {
 
         @Schema(description = "User id value")
-        private BigInteger id;
+        private UUID id;
 
-        @Schema(description = "User email value")
-        private String email;
+        @Schema(description = "User first name value")
+        private String firstName;
 
+        @Schema(description = "User last name value")
+        private String lastName;
     }
 
     @Singular

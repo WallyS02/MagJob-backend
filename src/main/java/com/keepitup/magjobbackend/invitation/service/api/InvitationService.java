@@ -7,24 +7,25 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface InvitationService {
 
-    Optional<List<Invitation>> findAllByUser(BigInteger userId);
+    Optional<List<Invitation>> findAllByUser(UUID userId);
 
-    Optional<List<Invitation>> findAllByUserAndIsActive(BigInteger userId, Boolean isActive);
+    Optional<List<Invitation>> findAllByUserAndIsActive(UUID userId, Boolean isActive);
 
     Optional<List<Invitation>> findAllByOrganization(BigInteger organizationId);
 
     Optional<List<Invitation>> findAllByOrganizationAndIsActive(BigInteger organizationId, Boolean isActive);
 
-    Optional<Invitation> findByUserAndOrganization(BigInteger userId, BigInteger organizationId);
+    Optional<Invitation> findByUserAndOrganization(UUID userId, BigInteger organizationId);
 
     List<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation);
 
     void create(Invitation invitation);
 
-    void delete(BigInteger userId, BigInteger organizationId);
+    void delete(UUID userId, BigInteger organizationId);
 
     void update(Invitation invitation);
 }

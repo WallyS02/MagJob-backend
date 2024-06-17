@@ -14,6 +14,8 @@ public interface RoleService {
 
     Optional<Role> findByExternalId(String externalId);
 
+    Optional<Role> findByNameAndOrganization(String name, Organization organization);
+
     List<Role> findAll();
 
     List<Role> findAllByOrganization(Organization organization);

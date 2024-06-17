@@ -5,14 +5,13 @@ import com.keepitup.magjobbackend.user.entity.User;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
     List<User> findAll();
-    Optional<User> find(BigInteger id);
+    Optional<User> find(UUID id);
 
     Optional<User> find(String email);
-
-    Optional<User> findByExternalId(String externalId);
 
     List<User> findAllByFirstname(String firstname);
 
@@ -21,10 +20,7 @@ public interface UserService {
     List<User> findAllByFirstnameAndLastname(String firstname, String lastname);
 
     void register(User user);
-
-    void delete(BigInteger id);
-
-    void deleteByExternalId(String externalId);
+    void delete(UUID id);
 
     void update(User user);
 }

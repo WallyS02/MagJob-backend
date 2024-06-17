@@ -2,6 +2,8 @@ package com.keepitup.magjobbackend.organization.controller.impl;
 
 import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.KeycloakController;
+import com.keepitup.magjobbackend.configuration.SecurityService;
+import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.controller.api.OrganizationController;
@@ -18,6 +20,7 @@ import com.keepitup.magjobbackend.user.service.api.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +28,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @Log
@@ -39,6 +43,7 @@ public class OrganizationDefaultController implements OrganizationController {
     private final RoleService roleService;
     private final RoleMemberService roleMemberService;
     private final KeycloakController keycloakController;
+    private final SecurityService securityService;
 
     @Autowired
     public OrganizationDefaultController(
@@ -51,7 +56,8 @@ public class OrganizationDefaultController implements OrganizationController {
             OrganizationToResponseFunction organizationToResponse,
             RequestToOrganizationFunction requestToOrganization,
             UpdateOrganizationWithRequestFunction updateOrganizationWithRequest,
-            KeycloakController keycloakController
+            KeycloakController keycloakController,
+            SecurityService securityService
     ) {
         this.service = service;
         this.memberService = memberService;
@@ -63,6 +69,7 @@ public class OrganizationDefaultController implements OrganizationController {
         this.requestToOrganization = requestToOrganization;
         this.updateOrganizationWithRequest = updateOrganizationWithRequest;
         this.keycloakController = keycloakController;
+        this.securityService = securityService;
     }
 
     @Override
@@ -72,14 +79,28 @@ public class OrganizationDefaultController implements OrganizationController {
 
     @Override
     public GetOrganizationResponse getOrganization(BigInteger id) {
+        Organization organization = service.find(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return service.find(id)
                 .map(organizationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public GetOrganizationsResponse getOrganizationsByUser(BigInteger id) {
-        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUser(id);
+    public GetOrganizationsResponse getOrganizationsByUser(UUID userId) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        Optional<List<Organization>> organizationsOptional = memberService.findAllOrganizationsByUserId(userId);
 
         List<Organization> organizations = organizationsOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -95,20 +116,44 @@ public class OrganizationDefaultController implements OrganizationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
             service.create(requestToOrganization.apply(postOrganizationRequest));
-            Optional<User> user = userService.find(postOrganizationRequest.getUser());
+            Optional<User> user = userService.find(postOrganizationRequest.getUserId());
             Optional<Organization> createdOrganization = service.findByName(postOrganizationRequest.getName());
 
             if (user.isPresent() && createdOrganization.isPresent()) {
                 roleName2groupExternalId =
-                        keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getExternalId());
+                        keycloakController.createGroupRepresentation(createdOrganization.get().getName(), user.get().getId());
 
-                for (String roleName : Constants.DEFAULT_ROLE_NAMES) {
-                    roleService.create(Role.builder()
-                            .name(roleName)
-                            .organization(createdOrganization.get())
-                            .externalId(roleName2groupExternalId.get(roleName))
-                            .build());
-                }
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_OWNER)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_OWNER))
+                        .canManageTasks(true)
+                        .canManageRoles(true)
+                        .canManageInvitations(true)
+                        .canManageAnnouncements(true)
+                        .isAdmin(true) // TODO delete in future; For testing purposes Owner will be also Admin
+                        .build());
+
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_MODERATOR)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_MODERATOR))
+                        .canManageTasks(true)
+                        .canManageRoles(false)
+                        .canManageInvitations(true)
+                        .canManageAnnouncements(true)
+                        .build());
+
+                roleService.create(Role.builder()
+                        .name(Constants.ROLE_NAME_MEMBER)
+                        .organization(createdOrganization.get())
+                        .externalId(roleName2groupExternalId.get(Constants.ROLE_NAME_MEMBER))
+                        .canManageTasks(false)
+                        .canManageRoles(false)
+                        .canManageInvitations(false)
+                        .canManageAnnouncements(false)
+                        .build());
+
 
                 memberService.create(Member.builder()
                         .pseudonym(Constants.ROLE_NAME_OWNER)
@@ -134,24 +179,32 @@ public class OrganizationDefaultController implements OrganizationController {
 
     @Override
     public void deleteOrganization(BigInteger id) {
-        service.find(id)
-                .ifPresentOrElse(
-                        organization -> service.delete(id),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Optional<Organization> organization = service.find(id);
+
+        if (organization.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!securityService.isOwner(organization.get())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.delete(id);
     }
 
     @Override
     public GetOrganizationResponse updateOrganization(BigInteger id, PatchOrganizationRequest patchOrganizationRequest) {
-        service.find(id)
-                .ifPresentOrElse(
-                        organization -> service.update(updateOrganizationWithRequest.apply(organization, patchOrganizationRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Optional<Organization> organization = service.find(id);
+
+        if (organization.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!securityService.isOwner(organization.get())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.update(updateOrganizationWithRequest.apply(organization.get(), patchOrganizationRequest));
         return getOrganization(id);
     }
 }

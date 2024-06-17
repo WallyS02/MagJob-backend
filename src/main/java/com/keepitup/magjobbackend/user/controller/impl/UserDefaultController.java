@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.user.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.user.controller.api.UserController;
 import com.keepitup.magjobbackend.user.dto.*;
@@ -14,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @Log
@@ -25,7 +26,7 @@ public class UserDefaultController implements UserController {
     private final UsersToResponseFunction usersToResponse;
     private final RequestToUserFunction requestToUser;
     private final UpdateUserWithRequestFunction updateUserWithRequest;
-    private final UpdateUserPasswordWithRequestFunction updateUserPasswordWithRequestFunction;
+    private final SecurityService securityService;
 
     @Autowired
     public UserDefaultController(
@@ -34,13 +35,15 @@ public class UserDefaultController implements UserController {
             UsersToResponseFunction usersToResponse,
             RequestToUserFunction requestToUser,
             UpdateUserWithRequestFunction updateUserWithRequest,
-            UpdateUserPasswordWithRequestFunction updateUserPasswordWithRequestFunction) {
+            UpdateUserPasswordWithRequestFunction updateUserPasswordWithRequestFunction,
+            SecurityService securityService
+    ) {
         this.service = service;
         this.userToResponse = userToResponse;
         this.usersToResponse = usersToResponse;
         this.requestToUser = requestToUser;
         this.updateUserWithRequest = updateUserWithRequest;
-        this.updateUserPasswordWithRequestFunction = updateUserPasswordWithRequestFunction;
+        this.securityService = securityService;
     }
 
     @Override
@@ -50,15 +53,15 @@ public class UserDefaultController implements UserController {
 
     @Override
     @PreAuthorize("isAuthenticated()")
-    public GetUserResponse getUser(String externalId) {
+    public GetUserResponse getUser(UUID id) {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
-        String loggedInUserId = jwt.getExternalId();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
 
-        if (!loggedInUserId.equals(externalId)) {
+        if (!loggedInUserId.equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
         }
 
-        return service.findByExternalId(externalId)
+        return service.find(id)
                 .map(userToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
@@ -68,7 +71,7 @@ public class UserDefaultController implements UserController {
     public GetUserResponse createUser() {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
 
-        Optional<User> user = service.findByExternalId(jwt.getExternalId());
+        Optional<User> user = service.find(UUID.fromString(jwt.getExternalId()));
 
         PostUserRequest postUserRequest;
         if (user.isPresent()) {
@@ -78,7 +81,7 @@ public class UserDefaultController implements UserController {
             postUserRequest.setEmail(jwt.getEmail());
             postUserRequest.setFirstname(jwt.getFirstname());
             postUserRequest.setLastname(jwt.getLastname());
-            postUserRequest.setExternalId(jwt.getExternalId());
+            postUserRequest.setId(UUID.fromString(jwt.getExternalId()));
 
             service.register(requestToUser.apply(postUserRequest));
         }
@@ -89,10 +92,14 @@ public class UserDefaultController implements UserController {
     }
 
     @Override
-    public void deleteUser(String externalId) {
-        service.findByExternalId(externalId)
+    public void deleteUser(UUID id) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.find(id)
                 .ifPresentOrElse(
-                        user -> service.deleteByExternalId(externalId),
+                        user -> service.delete(id),
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }
@@ -100,25 +107,21 @@ public class UserDefaultController implements UserController {
     }
 
     @Override
-    public GetUserResponse updateUser(String externalId, PatchUserRequest patchUserRequest) {
-        service.findByExternalId(externalId)
+    public GetUserResponse updateUser(UUID id, PatchUserRequest patchUserRequest) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
+        }
+
+        service.find(id)
                 .ifPresentOrElse(
                     user -> service.update(updateUserWithRequest.apply(user, patchUserRequest)),
                     () -> {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                     }
                 );
-        return getUser(externalId);
+        return getUser(id);
     }
-
-    public void updateUserPassword(BigInteger id, PutPasswordRequest putPasswordRequest) {
-        service.find(id)
-                .ifPresentOrElse(
-                        user -> service.update(updateUserPasswordWithRequestFunction.apply(user, putPasswordRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
-    }
-
 }

@@ -15,4 +15,6 @@ public interface RoleRepository extends JpaRepository<Role, BigInteger> {
 
     Optional<Role> findByExternalId(String externalId);
     List<Role> findAllByOrganization(Organization organization);
+
+    Optional<Role> findByNameAndOrganization(String name, Organization organization);
 }

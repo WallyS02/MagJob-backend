@@ -13,6 +13,10 @@ public class RequestToRoleFunction implements Function<PostRoleRequest, Role> {
     public Role apply(PostRoleRequest request) {
         return Role.builder()
                 .name(request.getName())
+                .canManageRoles(request.getCanManageTasks())
+                .canManageAnnouncements(request.getCanManageAnnouncements())
+                .canManageInvitations(request.getCanManageInvitations())
+                .canManageTasks(request.getCanManageTasks())
                 .organization(Organization.builder()
                         .id(request.getOrganization())
                         .build())

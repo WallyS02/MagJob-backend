@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name = "Invitation Controller")
 public interface InvitationController {
@@ -23,12 +24,12 @@ public interface InvitationController {
     @ResponseBody
     GetInvitationResponse getInvitation(
             @Parameter(
-                    name = "userId",
+                    name = "user id",
                     description = "User id value",
                     required = true
             )
             @PathVariable("userId")
-            BigInteger userId,
+            UUID userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",
@@ -61,7 +62,7 @@ public interface InvitationController {
                     required = true
             )
             @PathVariable("userId")
-            BigInteger  userId
+            UUID userId
     );
 
     @Operation(summary = "Get Invitations By Organization")
@@ -115,7 +116,7 @@ public interface InvitationController {
                     required = true
             )
             @PathVariable("userId")
-            BigInteger userId,
+            UUID userId,
             @Parameter(
                     name = "organizationId",
                     description = "Organization id value",
@@ -153,5 +154,4 @@ public interface InvitationController {
             @RequestBody
             PostInvitationRequest request
     );
-
 }

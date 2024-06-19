@@ -1,6 +1,9 @@
 package com.keepitup.magjobbackend.task.controller.impl;
 
 import com.keepitup.magjobbackend.assignee.service.api.AssigneeService;
+import com.keepitup.magjobbackend.configuration.Constants;
+import com.keepitup.magjobbackend.configuration.SecurityService;
+import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.api.OrganizationService;
 import com.keepitup.magjobbackend.task.controller.api.TaskController;
@@ -38,6 +41,8 @@ public class TaskDefaultController implements TaskController {
     private final TaskToResponseFunction taskToResponse;
     private final OrganizationService organizationService;
     private final AssigneeService assigneeService;
+    private final SecurityService securityService;
+    private final MemberService memberService;
 
     @Autowired
     public TaskDefaultController(
@@ -47,8 +52,9 @@ public class TaskDefaultController implements TaskController {
             TasksToResponseFunction tasksToResponse,
             TaskToResponseFunction taskToResponse,
             OrganizationService organizationService,
-            UserService userService,
-            AssigneeService assigneeService
+            AssigneeService assigneeService,
+            SecurityService securityService,
+            MemberService memberService
     ) {
         this.service = service;
         this.requestToTask = requestToTask;
@@ -57,10 +63,16 @@ public class TaskDefaultController implements TaskController {
         this.taskToResponse = taskToResponse;
         this.organizationService = organizationService;
         this.assigneeService = assigneeService;
+        this.securityService = securityService;
+        this.memberService = memberService;
     }
 
     @Override
     public GetTasksResponse getTasks(int page, int size) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+  
         PageRequest pageRequest = PageRequest.of(page, size);
         Integer count = service.findAll().size();
         return tasksToResponse.apply(service.findAll(pageRequest), count);
@@ -68,6 +80,10 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public GetTaskResponse getTask(BigInteger id) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return service.find(id)
                 .map(taskToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -75,10 +91,14 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public GetTasksResponse getTasksByOrganization(int page, int size, BigInteger id) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-
         Organization organization = organizationService.find(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+      
+        PageRequest pageRequest = PageRequest.of(page, size);
 
         Integer count = service.findAllByOrganization(organization, Pageable.unpaged()).getNumberOfElements();
 
@@ -87,6 +107,14 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public GetTasksResponse getTasksByMember(int page, int size, BigInteger id) {
+        Organization organization = memberService.find(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ).getOrganization();
+
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+      
         PageRequest pageRequest = PageRequest.of(page, size);
         Optional<Page<Task>> tasksOptional = assigneeService.findAllTasksByMember(id, pageRequest);
 
@@ -100,6 +128,17 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public GetTaskResponse createTask(PostTaskRequest postTaskRequest) {
+
+        Optional<Organization> organization = organizationService.find(postTaskRequest.getOrganization());
+
+        if (organization.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!securityService.hasPermission(organization.get(), Constants.PERMISSION_NAME_CAN_MANAGE_TASKS)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         Optional<Task> task = service.findByTitle(postTaskRequest.getTitle());
 
         if (task.isPresent()) {
@@ -114,13 +153,21 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public GetTaskResponse updateTask(BigInteger id, PatchTaskRequest patchTaskRequest) {
-        service.find(id)
-                .ifPresentOrElse(
-                        task -> service.update(updateTaskWithRequest.apply(task, patchTaskRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Task task = service.find(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        Optional<Organization> organization = organizationService.find(task.getOrganization().getId());
+
+        if (organization.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!securityService.hasPermission(organization.get(), Constants.PERMISSION_NAME_CAN_MANAGE_TASKS)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.update(updateTaskWithRequest.apply(task, patchTaskRequest));
 
         return taskToResponse.apply(service.find(id).get());
     }
@@ -138,12 +185,20 @@ public class TaskDefaultController implements TaskController {
 
     @Override
     public void deleteTask(BigInteger id) {
-        service.find(id)
-                .ifPresentOrElse(
-                        task -> service.delete(id),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Task task = service.find(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        Optional<Organization> organization = organizationService.find(task.getOrganization().getId());
+
+        if (organization.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if (!securityService.hasPermission(organization.get(), Constants.PERMISSION_NAME_CAN_MANAGE_TASKS)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.delete(id);
     }
 }

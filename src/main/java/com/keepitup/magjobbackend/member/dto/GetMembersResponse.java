@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -28,7 +30,7 @@ public class GetMembersResponse {
         private BigInteger id;
 
         @Schema(description = "User id value")
-        private BigInteger userId;
+        private UUID userId;
 
         @Schema(description = "Member pseudonym value")
         private String pseudonym;

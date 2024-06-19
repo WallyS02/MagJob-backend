@@ -26,6 +26,8 @@ public interface RoleMemberService {
 
     void create(RoleMember roleMember);
 
+    void createAll(List<RoleMember> roleMembers);
+
     void delete(BigInteger id);
 
     void update(RoleMember roleMember);

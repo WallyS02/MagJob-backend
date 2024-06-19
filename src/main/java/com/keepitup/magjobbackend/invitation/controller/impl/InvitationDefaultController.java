@@ -1,5 +1,8 @@
 package com.keepitup.magjobbackend.invitation.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.Constants;
+import com.keepitup.magjobbackend.configuration.KeycloakController;
+import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.invitation.controller.api.InvitationController;
 import com.keepitup.magjobbackend.invitation.dto.AcceptInvitationRequest;
 import com.keepitup.magjobbackend.invitation.dto.GetInvitationResponse;
@@ -10,6 +13,7 @@ import com.keepitup.magjobbackend.invitation.function.InvitationToResponseFuncti
 import com.keepitup.magjobbackend.invitation.function.InvitationsToResponseFunction;
 import com.keepitup.magjobbackend.invitation.function.RequestToInvitationFunction;
 import com.keepitup.magjobbackend.invitation.service.api.InvitationService;
+import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.member.dto.GetMemberResponse;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.function.MemberToResponseFunction;
@@ -24,11 +28,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @Log
@@ -42,6 +48,8 @@ public class InvitationDefaultController implements InvitationController {
     private final UserService userService;
     private final OrganizationService organizationService;
     private final MemberToResponseFunction memberToResponse;
+    private final KeycloakController keycloakController;
+    private final SecurityService securityService;
 
 
     @Autowired
@@ -52,7 +60,10 @@ public class InvitationDefaultController implements InvitationController {
                                        MemberService memberService,
                                        UserService userService,
                                        OrganizationService organizationService,
-                                       MemberToResponseFunction memberToResponse) {
+                                       MemberToResponseFunction memberToResponse,
+                                       KeycloakController keycloakController,
+                                       SecurityService securityService
+    ) {
         this.service = service;
         this.invitationsToResponse = invitationsToResponse;
         this.invitationToResponse = invitationToResponse;
@@ -61,18 +72,33 @@ public class InvitationDefaultController implements InvitationController {
         this.userService = userService;
         this.organizationService = organizationService;
         this.memberToResponse = memberToResponse;
+        this.keycloakController = keycloakController;
+        this.securityService = securityService;
     }
 
 
     @Override
-    public GetInvitationResponse getInvitation(BigInteger userId, BigInteger organizationId) {
+    public GetInvitationResponse getInvitation(UUID userId, BigInteger organizationId) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return service.findByUserAndOrganization(userId, organizationId)
                 .map(invitationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public GetInvitationsResponse getInvitationsByUser(int page, int size, BigInteger userId) {
+    public GetInvitationsResponse getInvitationsByUser(int page, int size, UUID userId) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+  
         PageRequest pageRequest = PageRequest.of(page, size);
 
         Optional<Page<Invitation>> countOptional = service.findAllByUserAndIsActive(userId, true, Pageable.unpaged());
@@ -90,6 +116,15 @@ public class InvitationDefaultController implements InvitationController {
 
     @Override
     public GetInvitationsResponse getInvitationsByOrganization(int page, int size, BigInteger organizationId) {
+        Optional<Organization> organizationOptional = organizationService.find(organizationId);
+
+        Organization organization = organizationOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+      
         PageRequest pageRequest = PageRequest.of(page, size);
 
         Optional<Page<Invitation>> countOptional = service.findAllByOrganizationAndIsActive(organizationId, true, Pageable.unpaged());
@@ -107,12 +142,20 @@ public class InvitationDefaultController implements InvitationController {
 
     @Override
     public GetInvitationResponse sendInvitation(PostInvitationRequest request) {
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
+        Organization organization = organizationService.find(request.getOrganization()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_INVITATIONS)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
         if (invitation.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
         else {
-            if (memberService.findByUserAndOrganization(userService.find(request.getUser()).get(),
+            if (memberService.findByUserAndOrganization(userService.find(request.getUserId()).get(),
                     organizationService.find(request.getOrganization()).get()).isPresent()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             } else {
@@ -120,13 +163,22 @@ public class InvitationDefaultController implements InvitationController {
             }
         }
 
-        return service.findByUserAndOrganization(request.getUser(), request.getOrganization())
+        return service.findByUserAndOrganization(request.getUserId(), request.getOrganization())
                 .map(invitationToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public void deleteInvitation(BigInteger userId, BigInteger organizationId) {
+    public void deleteInvitation(UUID userId, BigInteger organizationId) {
+
+        Organization organization = organizationService.find(organizationId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_INVITATIONS)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         service.findByUserAndOrganization(userId, organizationId)
                 .ifPresentOrElse(
                         invitation -> service.delete(userId, organizationId),
@@ -138,8 +190,16 @@ public class InvitationDefaultController implements InvitationController {
 
     @Override
     public GetMemberResponse acceptInvitation(AcceptInvitationRequest request) {
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
-        Optional<User> user = userService.find(request.getUser());
+
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(request.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
+        Optional<User> user = userService.find(request.getUserId());
         Optional<Organization> organization = organizationService.find(request.getOrganization());
 
         if (invitation.isPresent()) {
@@ -150,6 +210,8 @@ public class InvitationDefaultController implements InvitationController {
                         .organization(organization.get())
                         .user(user.get())
                         .build());
+
+                keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getId());
 
                 service.delete(user.get().getId(), organization.get().getId());
             } else {
@@ -166,9 +228,16 @@ public class InvitationDefaultController implements InvitationController {
     @Override
     public void rejectInvitation(PostInvitationRequest request) {
 
-        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUser(), request.getOrganization());
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        if (!loggedInUserId.equals(request.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        Optional<Invitation> invitation = service.findByUserAndOrganization(request.getUserId(), request.getOrganization());
         if (invitation.isPresent()) {
-            service.delete(request.getUser(), request.getOrganization());
+            service.delete(request.getUserId(), request.getOrganization());
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

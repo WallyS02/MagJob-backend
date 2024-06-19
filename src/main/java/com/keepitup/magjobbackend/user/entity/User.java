@@ -4,14 +4,15 @@ import com.keepitup.magjobbackend.invitation.entity.Invitation;
 import com.keepitup.magjobbackend.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -24,9 +25,8 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequenceGenerator")
-    @SequenceGenerator(name = "userSequenceGenerator")
-    private BigInteger id;
+    @Column(length = 254, unique = true, nullable = false, updatable = false)
+    private UUID id;
 
     @Email
     @Size(min = 5, max = 254)
@@ -40,11 +40,6 @@ public class User {
     @Size(max = 50)
     @Column(length = 50)
     private String lastname;
-
-    @NotNull
-    @Size(min = 60, max = 60)
-    @Column(name = "password_hash", length = 60, nullable = false)
-    private String password;
 
     @Column(name = "phone_number", length = 9, unique = true)
     private String phoneNumber;

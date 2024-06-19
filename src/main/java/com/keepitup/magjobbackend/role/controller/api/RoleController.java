@@ -1,10 +1,7 @@
 package com.keepitup.magjobbackend.role.controller.api;
 
+import com.keepitup.magjobbackend.role.dto.*;
 import com.keepitup.magjobbackend.configuration.PageConfig;
-import com.keepitup.magjobbackend.role.dto.GetRoleResponse;
-import com.keepitup.magjobbackend.role.dto.GetRolesResponse;
-import com.keepitup.magjobbackend.role.dto.PatchRoleRequest;
-import com.keepitup.magjobbackend.role.dto.PostRoleRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,7 +52,7 @@ public interface RoleController {
     @GetMapping("api/organizations/{organizationId}/roles")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    GetRolesResponse getRolesByOrganization(
+    GetRolesByOrganizationResponse getRolesByOrganization(
             @Parameter(
                     name = "page number",
                     description = "Page number to retrieve"
@@ -93,7 +90,7 @@ public interface RoleController {
     );
 
     @Operation(summary = "Update Role")
-    @PostMapping("api/roles/{id}")
+    @PatchMapping("api/roles/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetRoleResponse updateRole(

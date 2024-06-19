@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -25,7 +27,7 @@ public class GetInvitationResponse {
     public static class User {
 
         @Schema(description = "User id value")
-        private BigInteger id;
+        private UUID id;
 
         @Schema(description = "User email value")
         private String email;

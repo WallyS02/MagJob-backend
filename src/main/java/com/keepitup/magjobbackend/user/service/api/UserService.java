@@ -7,13 +7,14 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
     List<User> findAll();
 
     Page<User> findAll(Pageable pageable);
 
-    Optional<User> find(BigInteger id);
+    Optional<User> find(UUID id);
 
     Optional<User> find(String email);
 
@@ -24,8 +25,7 @@ public interface UserService {
     Page<User> findAllByFirstnameAndLastname(String firstname, String lastname, Pageable pageable);
 
     void register(User user);
-
-    void delete(BigInteger id);
+    void delete(UUID id);
 
     void update(User user);
 }

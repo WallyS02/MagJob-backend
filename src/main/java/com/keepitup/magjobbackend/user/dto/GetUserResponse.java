@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -16,7 +18,7 @@ import java.time.LocalDate;
 public class GetUserResponse {
 
     @Schema(description = "User id value")
-    private BigInteger id;
+    private UUID id;
 
     @Schema(description = "User email value")
     private String email;

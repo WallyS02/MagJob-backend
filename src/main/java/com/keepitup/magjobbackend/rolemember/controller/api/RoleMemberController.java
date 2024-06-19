@@ -4,6 +4,7 @@ import com.keepitup.magjobbackend.configuration.PageConfig;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMemberResponse;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMembersResponse;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMemberRequest;
+import com.keepitup.magjobbackend.rolemember.dto.PostRoleMembersRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name="Role Member Controller")
 public interface RoleMemberController {
@@ -117,16 +119,40 @@ public interface RoleMemberController {
             PostRoleMemberRequest postRoleMemberRequest
     );
 
+    @Operation(summary = "Create Many Role Members")
+    @PostMapping("api/role-members/list")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    GetRoleMembersResponse createRoleMembers(
+            @Parameter(
+                    name = "PostRoleMembersRequest",
+                    description = "PostRoleMembersRequest DTO",
+                    schema = @Schema(implementation = PostRoleMembersRequest.class),
+                    required = true
+            )
+            @RequestBody
+            PostRoleMembersRequest postRoleMembersRequest
+    );
+
+
+
     @Operation(summary = "Delete Role Member")
-    @DeleteMapping("/api/role-members/{id}")
+    @DeleteMapping("/api/role-members/{memberId}/{roleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteRoleMember(
             @Parameter(
-                    name = "id",
-                    description = "Role Member id value",
+                    name = "memberId",
+                    description = "Member id value",
                     required = true
             )
-            @PathVariable("id")
-            BigInteger id
+            @PathVariable("memberId")
+            BigInteger memberId,
+            @Parameter(
+                    name = "roleId",
+                    description = "Role id value",
+                    required = true
+            )
+            @PathVariable("roleId")
+            BigInteger roleId
     );
 }

@@ -38,6 +38,11 @@ public class RoleDefaultService implements RoleService {
     }
 
     @Override
+    public Optional<Role> findByNameAndOrganization(String name, Organization organization) {
+        return roleRepository.findByNameAndOrganization(name, organization);
+    }
+
+    @Override
     public List<Role> findAll() {
         return roleRepository.findAll();
     }

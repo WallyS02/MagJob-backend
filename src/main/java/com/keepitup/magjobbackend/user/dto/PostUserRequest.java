@@ -3,6 +3,8 @@ package com.keepitup.magjobbackend.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -13,6 +15,9 @@ import lombok.*;
 @Schema(description = "PostUserRequest DTO")
 public class PostUserRequest {
 
+    @Schema(description = "User id value")
+    private UUID id;
+
     @Schema(description = "User email value")
     private String email;
 
@@ -21,8 +26,4 @@ public class PostUserRequest {
 
     @Schema(description = "User lastname value")
     private String lastname;
-
-    @Schema(description = "User password value")
-    private String password;
-
 }

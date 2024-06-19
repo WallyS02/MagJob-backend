@@ -6,11 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, BigInteger> {
+public interface UserRepository extends JpaRepository<User, UUID> {
+    Optional<User> findById(UUID id);
     Optional<User> findByEmail(String email);
     Page<User> findAllByFirstname(String firstname, Pageable pageable);
     Page<User> findAllByLastname(String lastname, Pageable pageable);

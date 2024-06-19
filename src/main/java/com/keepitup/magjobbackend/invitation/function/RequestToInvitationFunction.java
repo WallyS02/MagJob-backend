@@ -14,7 +14,7 @@ public class RequestToInvitationFunction implements Function<PostInvitationReque
     public Invitation apply(PostInvitationRequest request) {
         return Invitation.builder()
                 .user(User.builder()
-                        .id(request.getUser())
+                        .id(request.getUserId())
                         .build())
                 .organization(Organization.builder()
                         .id(request.getOrganization())

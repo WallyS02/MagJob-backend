@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -163,7 +164,7 @@ class MemberDefaultServiceTest {
     @Test
     void testFindAllOrganizationsByUser() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         User user = new User();
         Page<Member> members = new PageImpl<>(new ArrayList<>());
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));

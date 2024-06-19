@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MemberDefaultService implements MemberService {
@@ -72,7 +74,7 @@ public class MemberDefaultService implements MemberService {
     }
 
     @Override
-    public Optional<Page<Organization>> findAllOrganizationsByUser(BigInteger userId, Pageable pageable) {
+    public Optional<Page<Organization>> findAllOrganizationsByUser(UUID userId, Pageable pageable) {
         return userRepository.findById(userId)
                 .map(user -> memberRepository.findAllByUser(user, pageable))
                 .map(members -> members.map(Member::getOrganization));

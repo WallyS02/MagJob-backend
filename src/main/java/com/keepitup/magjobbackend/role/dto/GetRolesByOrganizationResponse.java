@@ -13,8 +13,26 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode
-@Schema(description = "GetRolesResponse DTO")
-public class GetRolesResponse {
+@Schema(description = "GetMembersByOrganizationResponse DTO")
+public class GetRolesByOrganizationResponse {
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @ToString
+    @EqualsAndHashCode
+    public static class Member {
+        @Schema(description = "Member id value")
+        private BigInteger id;
+
+        @Schema(description = "Member first name")
+        private String firstName;
+
+        @Schema(description = "Member last name")
+        private String lastName;
+    }
     @Getter
     @Setter
     @Builder
@@ -46,6 +64,10 @@ public class GetRolesResponse {
 
         @Schema(description = "Permission to Manage Roles")
         private Boolean canManageRoles;
+
+        @Singular
+        @Schema(description = "Member list")
+        private List<Member> members;
     }
 
     @Singular

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name="Organization Controller")
 public interface OrganizationController {
@@ -34,8 +35,8 @@ public interface OrganizationController {
             int size
     );
 
-    @Operation(summary = "Get Organizations By User")
-    @GetMapping("api/organizations/users/{userId}")
+    @Operation(summary = "Get Organizations By User id")
+    @GetMapping("api/organizations/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     GetOrganizationsResponse getOrganizationsByUser(
@@ -52,12 +53,12 @@ public interface OrganizationController {
             @RequestParam(defaultValue = "#{pageConfig.size}")
             int size,
             @Parameter(
-                    name = "id",
+                    name = "user id",
                     description = "User id value",
                     required = true
             )
-            @PathVariable("userId")
-            BigInteger id
+            @PathVariable("id")
+            UUID userId
     );
 
     @Operation(summary = "Get Organization")

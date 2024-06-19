@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Tag(name = "User Controller")
 public interface UserController {
@@ -47,23 +49,14 @@ public interface UserController {
                     required = true
             )
             @PathVariable("id")
-            BigInteger id
+            UUID id
     );
 
     @Operation(summary = "Create User")
     @PostMapping("/api/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    GetUserResponse createUser(
-            @Parameter(
-                    name = "PostUserRequest",
-                    description = "PostUserRequest DTO",
-                    schema = @Schema(implementation = PostUserRequest.class),
-                    required = true
-            )
-            @RequestBody
-            PostUserRequest postUserRequest
-    );
+    GetUserResponse createUser();
 
     @Operation(summary = "Delete User")
     @DeleteMapping("/api/users/{id}")
@@ -75,7 +68,7 @@ public interface UserController {
                     required = true
             )
             @PathVariable("id")
-            BigInteger id
+            UUID id
     );
 
     @Operation(summary = "Update User")
@@ -89,7 +82,7 @@ public interface UserController {
                     required = true
             )
             @PathVariable("id")
-            BigInteger id,
+            UUID id,
             @Parameter(
                     name = "PatchUserRequest",
                     description = "PatchUserRequest DTO",
@@ -99,35 +92,4 @@ public interface UserController {
             @RequestBody
             PatchUserRequest patchUserRequest
     );
-
-    @Operation(summary = "Update User Password")
-    @PutMapping("/api/users/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    void updateUserPassword(
-            @Parameter(
-                    name = "id",
-                    description = "User id value",
-                    required = true
-            )
-            @PathVariable("id")
-            BigInteger id,
-            @Parameter(
-                    name = "PutPasswordRequest",
-                    description = "putPasswordRequest DTO",
-                    schema = @Schema(implementation = PutPasswordRequest.class),
-                    required = true
-            )
-            @RequestBody
-            PutPasswordRequest putPasswordRequest
-    );
-
-    @Operation(summary = "Create authentication token")
-    @PostMapping("/api/users/login")
-    @ResponseStatus(HttpStatus.OK)
-    AuthenticationResponse createAuthenticationToken(
-            @RequestBody
-            AuthenticationRequest authenticationRequest,
-            HttpServletResponse response
-    ) throws IOException;
-
 }

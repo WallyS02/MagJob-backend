@@ -59,6 +59,11 @@ public class RoleMemberDefaultService implements RoleMemberService {
     }
 
     @Override
+    public void createAll(List<RoleMember> roleMembers) {
+        roleMemberRepository.saveAll(roleMembers);
+    }
+
+    @Override
     public void delete(BigInteger id) {
         roleMemberRepository.findById(id).ifPresent(roleMemberRepository::delete);
     }

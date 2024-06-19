@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MemberService {
     Page<Member> findAllByIsStillMember(Boolean isStillMember, Pageable pageable);
@@ -26,7 +27,7 @@ public interface MemberService {
 
     Optional<Page<User>> findAllUsersByOrganization(BigInteger organizationId, Pageable pageable);
 
-    Optional<Page<Organization>> findAllOrganizationsByUser(BigInteger userId, Pageable pageable);
+    Optional<Page<Organization>> findAllOrganizationsByUser(UUID userId, Pageable pageable);
 
     Optional<Member> findByUserAndOrganization(User user, Organization organization);
 

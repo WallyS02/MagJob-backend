@@ -12,18 +12,16 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserDefaultService implements UserService {
 
     private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
     @Autowired
-    public UserDefaultService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserDefaultService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class UserDefaultService implements UserService {
     }
 
     @Override
-    public Optional<User> find(BigInteger id) {
+    public Optional<User> find(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -63,18 +61,16 @@ public class UserDefaultService implements UserService {
 
     @Override
     public void register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
     @Override
-    public void delete(BigInteger id) {
+    public void delete(UUID id) {
         userRepository.findById(id).ifPresent(userRepository::delete);
     }
 
     @Override
     public void update(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 }

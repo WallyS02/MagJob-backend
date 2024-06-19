@@ -7,13 +7,11 @@ import com.keepitup.magjobbackend.member.dto.PatchMemberRequest;
 import com.keepitup.magjobbackend.member.dto.PostMemberRequest;
 import com.keepitup.magjobbackend.organization.dto.PatchOrganizationRequest;
 import com.keepitup.magjobbackend.organization.dto.PostOrganizationRequest;
-import com.keepitup.magjobbackend.user.dto.AuthenticationRequest;
 import com.keepitup.magjobbackend.user.dto.PatchUserRequest;
 import com.keepitup.magjobbackend.user.dto.PostUserRequest;
 import com.keepitup.magjobbackend.user.dto.PutPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +112,7 @@ public class SmokeTests {
         postUserRequest.setEmail(USER_EMAIL_TEST_VALUE);
         postUserRequest.setFirstname(USER_FIRSTNAME_TEST_VALUE);
         postUserRequest.setLastname(USER_LASTNAME_TEST_VALUE);
-        postUserRequest.setPassword(USER_PASSWORD_TEST_VALUE);
+        //postUserRequest.setPassword(USER_PASSWORD_TEST_VALUE);
 
         testUserPassword = USER_PASSWORD_TEST_VALUE;
 
@@ -126,7 +124,7 @@ public class SmokeTests {
         return response;
     }
 
-    @Operation(summary = "Login Test")
+    /*@Operation(summary = "Login Test")
     @GetMapping("/healthcheck/loginTest")
     public ResponseEntity<String> loginTest() {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
@@ -134,17 +132,17 @@ public class SmokeTests {
         authenticationRequest.setPassword(testUserPassword);
 
         return restTemplate.postForEntity("/api/users/login", authenticationRequest, String.class);
-    }
+    }*/
 
-    @Operation(summary = "Get all Users Test")
+    /*@Operation(summary = "Get all Users Test")
     @GetMapping("/healthcheck/getUsersTest")
     public ResponseEntity<String> getUsersTest() throws JSONException {
         HttpEntity<String> entity = createHttpEntityWithAuthenticatedTestUserCredentials(USER_EMAIL_TEST_VALUE, testUserPassword);
 
         return restTemplate.exchange("/api/users", HttpMethod.GET, entity, String.class);
-    }
+    }*/
 
-    @Operation(summary = "Get User Test")
+    /*@Operation(summary = "Get User Test")
     @GetMapping("/healthcheck/getUserTest")
     public ResponseEntity<String> getUserTest() throws JSONException {
         HttpEntity<String> entity = createHttpEntityWithAuthenticatedTestUserCredentials(USER_EMAIL_TEST_VALUE, testUserPassword);
@@ -526,5 +524,5 @@ public class SmokeTests {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         return new HttpEntity<>(headers);
-    }
+    }*/
 }

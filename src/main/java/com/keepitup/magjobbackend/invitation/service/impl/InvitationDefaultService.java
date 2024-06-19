@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class InvitationDefaultService implements InvitationService {
@@ -32,13 +33,13 @@ public class InvitationDefaultService implements InvitationService {
 
 
     @Override
-    public Optional<Page<Invitation>> findAllByUser(BigInteger userId, Pageable pageable) {
+    public Optional<Page<Invitation>> findAllByUser(UUID userId, Pageable pageable) {
         return userRepository.findById(userId)
                 .map(invitation -> invitationRepository.findAllByUser(invitation, pageable));
     }
 
     @Override
-    public Optional<Page<Invitation>> findAllByUserAndIsActive(BigInteger userId, Boolean isActive, Pageable pageable) {
+    public Optional<Page<Invitation>> findAllByUserAndIsActive(UUID userId, Boolean isActive, Pageable pageable) {
         return userRepository.findById(userId)
                 .map(user -> invitationRepository.findAllByUserAndIsActive(user, isActive, pageable));
     }
@@ -56,8 +57,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public Optional<Invitation> findByUserAndOrganization(BigInteger userId, BigInteger organizationId) {
-        return invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId);
+    public Optional<Invitation> findByUserAndOrganization(UUID userId, BigInteger organizationId) {
+        return invitationRepository.findByUserIdAndOrganizationId(userId, organizationId);
     }
 
     @Override
@@ -73,8 +74,8 @@ public class InvitationDefaultService implements InvitationService {
     }
 
     @Override
-    public void delete(BigInteger userId, BigInteger organizationId) {
-        invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId).ifPresent(invitationRepository::delete);
+    public void delete(UUID userId, BigInteger organizationId) {
+        invitationRepository.findByUserIdAndOrganizationId(userId, organizationId).ifPresent(invitationRepository::delete);
     }
 
     @Override

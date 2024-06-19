@@ -3,7 +3,8 @@ package com.keepitup.magjobbackend.organization.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigInteger;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -21,6 +22,6 @@ public class PostOrganizationRequest {
     private byte[] banner;
 
     @Schema(description = "User id value")
-    private BigInteger user;
+    private UUID userId;
 
 }

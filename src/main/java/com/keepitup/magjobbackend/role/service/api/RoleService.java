@@ -16,6 +16,8 @@ public interface RoleService {
 
     Optional<Role> findByExternalId(String externalId);
 
+    Optional<Role> findByNameAndOrganization(String name, Organization organization);
+
     List<Role> findAll();
 
     Page<Role> findAll(Pageable pageable);

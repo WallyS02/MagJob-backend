@@ -1,7 +1,10 @@
 package com.keepitup.magjobbackend.member.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.KeycloakController;
+import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
 import com.keepitup.magjobbackend.member.dto.*;
+import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.function.*;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
@@ -30,6 +33,8 @@ public class MemberDefaultController implements MemberController {
     private final MemberToResponseFunction memberToResponse;
     private final RequestToMemberFunction requestToMember;
     private final UpdateMemberWithRequestFunction updateMemberWithRequest;
+    private final KeycloakController keycloakController;
+    private final SecurityService securityService;
 
     @Autowired
     public MemberDefaultController(
@@ -39,7 +44,9 @@ public class MemberDefaultController implements MemberController {
             MembersToResponseFunction membersToResponse,
             MemberToResponseFunction memberToResponse,
             RequestToMemberFunction requestToMember,
-            UpdateMemberWithRequestFunction updateMemberWithRequest
+            UpdateMemberWithRequestFunction updateMemberWithRequest,
+            KeycloakController keycloakController,
+            SecurityService securityService
     ) {
         this.service = service;
         this.userService = userService;
@@ -48,10 +55,16 @@ public class MemberDefaultController implements MemberController {
         this.memberToResponse = memberToResponse;
         this.requestToMember = requestToMember;
         this.updateMemberWithRequest = updateMemberWithRequest;
+        this.keycloakController = keycloakController;
+        this.securityService = securityService;
     }
 
     @Override
     public GetMembersResponse getMembers(int page, int size) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+  
         PageRequest pageRequest = PageRequest.of(page, size);
         Integer count = service.findAllByIsStillMember(true, Pageable.unpaged()).getNumberOfElements();
         return membersToResponse.apply(service.findAllByIsStillMember(true, pageRequest), count);
@@ -66,6 +79,10 @@ public class MemberDefaultController implements MemberController {
         Organization organization = organizationOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        if(!securityService.belongsToOrganization(organization)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         Integer count = service.findAllByOrganizationAndIsStillMember(organization, true, Pageable.unpaged()).getNumberOfElements();
 
         return membersToResponse.apply(service.findAllByOrganizationAndIsStillMember(organization, true, pageRequest), count);
@@ -73,6 +90,10 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public GetMemberResponse getMember(BigInteger id) {
+        if (!securityService.hasAdminPermission()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         return service.findByIdAndIsStillMember(id, true)
                 .map(memberToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -80,16 +101,24 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public GetMemberResponse createMember(PostMemberRequest postMemberRequest) {
-        Optional<Page<Organization>> organizations = service.findAllOrganizationsByUser(postMemberRequest.getUser(), Pageable.unpaged());
+        Optional<Page<Organization>> organizations = service.findAllOrganizationsByUser(postMemberRequest.getUserId(), Pageable.unpaged());
         Optional<Organization>  organization = organizationService.find(postMemberRequest.getOrganization());
-        Optional<User> user = userService.find(postMemberRequest.getUser());
+        Optional<User> user = userService.find(postMemberRequest.getUserId());
+
 
         if (user.isEmpty() || organization.isEmpty() || organizations.isEmpty()
                 || organizations.get().stream().toList().contains(organization.get())
         ) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         } else {
+
+            if (!securityService.isOwner(organization.get())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+
             service.create(requestToMember.apply(postMemberRequest));
+
+            keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getId());
         }
         return service.findByUserAndOrganization(user.get(), organization.get())
                 .map(memberToResponse)
@@ -98,24 +127,34 @@ public class MemberDefaultController implements MemberController {
 
     @Override
     public void deleteMember(BigInteger id) {
-        service.findByIdAndIsStillMember(id, true)
-                .ifPresentOrElse(
-                        member -> service.delete(id),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Member memberToDelete = service.findByIdAndIsStillMember(id, true).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        if (!securityService.isOwner(memberToDelete.getOrganization())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        keycloakController.removeUserFromKeycloakGroup(
+                memberToDelete.getOrganization().getName(),
+                memberToDelete.getUser().getId()
+        );
+
+        service.delete(id);
     }
 
     @Override
     public GetMemberResponse updateMember(BigInteger id, PatchMemberRequest patchMemberRequest) {
-        service.findByIdAndIsStillMember(id, true)
-                .ifPresentOrElse(
-                        member -> service.update(updateMemberWithRequest.apply(member, patchMemberRequest)),
-                        () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }
-                );
+        Member member = service.findByIdAndIsStillMember(id, true).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        if (!securityService.isOwner(member.getOrganization())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        service.update(updateMemberWithRequest.apply(member, patchMemberRequest));
+
         return getMember(id);
     }
 }

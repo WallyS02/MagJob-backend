@@ -1,20 +1,19 @@
 package com.keepitup.magjobbackend.configuration;
 
-import com.keepitup.magjobbackend.user.filter.JwtRequestFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.keepitup.magjobbackend.jwt.CustomJwt;
+import com.keepitup.magjobbackend.jwt.CustomJwtConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -23,16 +22,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
     private static final AntPathRequestMatcher[] permitAllList = {
             new AntPathRequestMatcher("/api/users", "POST"),
-            new AntPathRequestMatcher("/api/users/login"),
+            /*new AntPathRequestMatcher("/api/users/login")*/
             new AntPathRequestMatcher("/v3/api-docs/**", "GET"),
-            new AntPathRequestMatcher("/swagger-ui/**")
+            new AntPathRequestMatcher("/swagger-ui/**"),
     };
 
     private static final AntPathRequestMatcher[] authenticatedList = {
             new AntPathRequestMatcher("/api/users/{id}"),
             new AntPathRequestMatcher("/api/users", "GET"),
-//            new AntPathRequestMatcher("/v3/api-docs/**", "GET"),
-//            new AntPathRequestMatcher("/swagger-ui/**"),
             new AntPathRequestMatcher("/actuator/**"),
             new AntPathRequestMatcher("/api/organizations"),
             new AntPathRequestMatcher("/api/organizations/{id}"),
@@ -71,35 +68,36 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/members/{memberId}/role-members")
     };
 
-    private final JwtRequestFilter jwtRequestFilter;
-
-    @Autowired
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
-        this.jwtRequestFilter = jwtRequestFilter;
-    }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    //Rest of old implementation
+    /*@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizeHttpRequests ->
-                        authorizeHttpRequests
-                                .requestMatchers(permitAllList).permitAll()
-                                .requestMatchers(authenticatedList).authenticated()
-                                .anyRequest().denyAll()
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
-
+                .csrf(AbstractHttpConfigurer::disable)
+    }*/
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(permitAllList).permitAll()
+                        .requestMatchers(authenticatedList).authenticated()
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(
+                        jwt -> jwt.jwtAuthenticationConverter(customJwtConverter())
+                ));
+        return http.build();
+    }
+    @Bean
+    public Converter<Jwt, CustomJwt> customJwtConverter() {
+        return new CustomJwtConverter();
     }
 }

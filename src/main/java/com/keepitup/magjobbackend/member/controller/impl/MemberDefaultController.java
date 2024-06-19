@@ -4,6 +4,7 @@ import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
 import com.keepitup.magjobbackend.member.dto.*;
+import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.function.*;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
 import com.keepitup.magjobbackend.organization.entity.Organization;

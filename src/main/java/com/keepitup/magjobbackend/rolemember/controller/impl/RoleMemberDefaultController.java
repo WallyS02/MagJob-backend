@@ -169,11 +169,14 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
         roleMemberService.createAll(requestToRoleMembersFunction.apply(postRoleMembersRequest));
 
+        Role role = roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Integer count = roleMemberService.findAllByRole(role, Pageable.unpaged()).getNumberOfElements();
+
         return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(
-                roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-                )
-        ));
+                role,
+                Pageable.unpaged()
+        ), count);
     }
 
     @Override

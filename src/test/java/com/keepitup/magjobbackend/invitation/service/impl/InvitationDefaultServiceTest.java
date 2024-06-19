@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -45,7 +46,7 @@ class InvitationDefaultServiceTest {
     @Test
     void testFindAllByUser() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         User user = new User();
         Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
         PageRequest pageRequest = PageRequest.of(0, 1);
@@ -64,7 +65,7 @@ class InvitationDefaultServiceTest {
     @Test
     void testFindAllByUserAndIsActive() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         boolean isActive = true;
         User user = new User();
         Page<Invitation> expectedInvitations = new PageImpl<>(List.of(new Invitation()));
@@ -123,17 +124,17 @@ class InvitationDefaultServiceTest {
     @Test
     void testFindByUserAndOrganization() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         BigInteger organizationId = BigInteger.ONE;
         Invitation expectedInvitation = new Invitation();
-        when(invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId)).thenReturn(Optional.of(expectedInvitation));
+        when(invitationRepository.findByUserIdAndOrganizationId(userId, organizationId)).thenReturn(Optional.of(expectedInvitation));
 
         // Act
         Optional<Invitation> result = invitationService.findByUserAndOrganization(userId, organizationId);
 
         // Assert
         assertEquals(expectedInvitation, result.orElse(null));
-        verify(invitationRepository).findByUser_IdAndOrganization_Id(userId, organizationId);
+        verify(invitationRepository).findByUserIdAndOrganizationId(userId, organizationId);
     }
 
     @Test
@@ -169,16 +170,16 @@ class InvitationDefaultServiceTest {
     @Test
     void testDelete() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         BigInteger organizationId = BigInteger.ONE;
         Invitation invitation = new Invitation();
-        when(invitationRepository.findByUser_IdAndOrganization_Id(userId, organizationId)).thenReturn(Optional.of(invitation));
+        when(invitationRepository.findByUserIdAndOrganizationId(userId, organizationId)).thenReturn(Optional.of(invitation));
 
         // Act
         invitationService.delete(userId, organizationId);
 
         // Assert
-        verify(invitationRepository).findByUser_IdAndOrganization_Id(userId, organizationId);
+        verify(invitationRepository).findByUserIdAndOrganizationId(userId, organizationId);
         verify(invitationRepository).delete(invitation);
     }
 

@@ -20,5 +20,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, BigInteg
     Page<Invitation> findAllByOrganization(Organization organization, Pageable pageable);
     Page<Invitation> findAllByOrganizationAndIsActive(Organization organization, Boolean isActive, Pageable pageable);
     Page<Invitation> findAllByDateOfCreation(ZonedDateTime dateOfCreation, Pageable pageable);
-    Optional<Invitation> findByUser_IdAndOrganization_Id(UUID userId, BigInteger organizationId);
+    Optional<Invitation> findByUserIdAndOrganizationId(UUID userId, BigInteger organizationId);
 }

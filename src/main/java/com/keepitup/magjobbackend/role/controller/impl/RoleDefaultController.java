@@ -78,7 +78,7 @@ public class RoleDefaultController implements RoleController {
     }
 
     @Override
-    public GetRolesResponse getRolesByOrganization(int page, int size, BigInteger organizationId) {
+    public GetRolesByOrganizationResponse getRolesByOrganization(int page, int size, BigInteger organizationId) {
         PageRequest pageRequest = PageRequest.of(page, size);
       
         Optional<Organization> organizationOptional = organizationService.find(organizationId);
@@ -92,7 +92,7 @@ public class RoleDefaultController implements RoleController {
 
         Integer count = roleService.findAllByOrganization(organization, Pageable.unpaged()).getNumberOfElements();
 
-        return rolesToResponseFunction.apply(roleService.findAllByOrganization(organization, pageRequest), count);
+        return rolesByOrganizationToResponseFunction.apply(roleService.findAllByOrganization(organization, pageRequest), count);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class RoleDefaultController implements RoleController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        boolean roleExists = roleService.findAllByOrganization(organization)
+        boolean roleExists = roleService.findAllByOrganization(organization, Pageable.unpaged())
                 .stream().anyMatch(role -> role.getName().equalsIgnoreCase(postRoleRequest.getName()));
 
         if (roleExists) {

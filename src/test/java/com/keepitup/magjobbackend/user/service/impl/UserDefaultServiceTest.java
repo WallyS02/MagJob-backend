@@ -12,10 +12,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -53,7 +53,7 @@ class UserDefaultServiceTest {
     @Test
     void testFind() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         User user = new User();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -134,15 +134,13 @@ class UserDefaultServiceTest {
         userService.register(user);
 
         // Assert
-        // Change for Keycloak auth later
-        verify(passwordEncoder, times(1)).encode(user.getPassword());
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
     void testDelete() {
         // Arrange
-        BigInteger userId = BigInteger.ONE;
+        UUID userId = UUID.randomUUID();
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
 
         // Act
@@ -161,8 +159,6 @@ class UserDefaultServiceTest {
         userService.update(user);
 
         // Assert
-        // Change for Keycloak auth later
-        verify(passwordEncoder, times(1)).encode(user.getPassword());
         verify(userRepository, times(1)).save(user);
     }
 }

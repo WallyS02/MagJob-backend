@@ -1,11 +1,15 @@
-package com.keepitup.magjobbackend.user.utils;
+package com.keepitup.magjobbackend.util;
 
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class ImageUtil {
+
     public static byte[] compressImage(byte[] data) {
+        if (data == null || data.length == 0) {
+            return null;
+        }
 
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
@@ -26,6 +30,10 @@ public class ImageUtil {
     }
 
     public static byte[] decompressImage(byte[] data) {
+        if (data == null || data.length == 0) {
+            return null;
+        }
+
         Inflater inflater = new Inflater();
         inflater.setInput(data);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);

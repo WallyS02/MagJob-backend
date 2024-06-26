@@ -2,7 +2,7 @@ package com.keepitup.magjobbackend.user.function;
 
 import com.keepitup.magjobbackend.user.dto.GetUserResponse;
 import com.keepitup.magjobbackend.user.entity.User;
-import com.keepitup.magjobbackend.user.utils.ImageUtil;
+import com.keepitup.magjobbackend.util.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;

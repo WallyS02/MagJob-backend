@@ -2,7 +2,7 @@ package com.keepitup.magjobbackend.organization.function;
 
 import com.keepitup.magjobbackend.organization.dto.PostOrganizationRequest;
 import com.keepitup.magjobbackend.organization.entity.Organization;
-import com.keepitup.magjobbackend.user.utils.ImageUtil;
+import com.keepitup.magjobbackend.util.ImageUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;

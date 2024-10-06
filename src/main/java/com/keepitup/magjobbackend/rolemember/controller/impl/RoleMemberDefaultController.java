@@ -13,6 +13,7 @@ import com.keepitup.magjobbackend.rolemember.dto.GetRoleMemberResponse;
 import com.keepitup.magjobbackend.rolemember.dto.GetRoleMembersResponse;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMemberRequest;
 import com.keepitup.magjobbackend.rolemember.dto.PostRoleMembersRequest;
+import com.keepitup.magjobbackend.rolemember.entity.RoleMember;
 import com.keepitup.magjobbackend.rolemember.function.RequestToRoleMemberFunction;
 import com.keepitup.magjobbackend.rolemember.function.RequestToRoleMembersFunction;
 import com.keepitup.magjobbackend.rolemember.function.RoleMemberToResponseFunction;
@@ -172,6 +173,11 @@ public class RoleMemberDefaultController implements RoleMemberController {
         Role role = roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Integer count = roleMemberService.findAllByRole(role, Pageable.unpaged()).getNumberOfElements();
+
+        RoleMember roleMember = roleMemberService.findAllByRole(role, Pageable.unpaged()).getContent().get(0);
+
+        roleMember.setMember(memberService.find(roleMember.getMember().getId()).get());
+        roleMemberService.update(roleMember);
 
         return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(
                 role,

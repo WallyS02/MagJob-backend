@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.materialreceiver.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.material.service.impl.MaterialDefaultService;
 import com.keepitup.magjobbackend.materialreceiver.controller.api.MaterialReceiverController;
@@ -14,6 +15,8 @@ import com.keepitup.magjobbackend.materialreceiver.function.UpdateMaterialReceiv
 import com.keepitup.magjobbackend.materialreceiver.service.impl.MaterialReceiverDefaultService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
     private final MaterialReceiverDefaultService materialReceiverService;
     private final MaterialDefaultService materialService;
     private final MemberDefaultService memberService;
+    private final NotificationDefaultService notificationService;
     private final MaterialReceiverToResponseFunction materialReceiverToResponseFunction;
     private final MaterialReceiversToResponseFunction materialReceiversToResponseFunction;
     private final RequestToMaterialReceiverFunction requestToMaterialReceiverFunction;
@@ -39,6 +43,7 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
             MaterialReceiverDefaultService materialReceiverService,
             MaterialDefaultService materialService,
             MemberDefaultService memberService,
+            NotificationDefaultService notificationService,
             MaterialReceiverToResponseFunction materialReceiverToResponseFunction,
             MaterialReceiversToResponseFunction materialReceiversToResponseFunction,
             RequestToMaterialReceiverFunction requestToMaterialReceiverFunction,
@@ -47,6 +52,7 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
         this.materialReceiverService = materialReceiverService;
         this.materialService = materialService;
         this.memberService = memberService;
+        this.notificationService = notificationService;
         this.materialReceiverToResponseFunction = materialReceiverToResponseFunction;
         this.materialReceiversToResponseFunction = materialReceiversToResponseFunction;
         this.requestToMaterialReceiverFunction = requestToMaterialReceiverFunction;
@@ -96,6 +102,14 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
     @Override
     public GetMaterialReceiverResponse createMaterialReceiver(PostMaterialReceiverRequest postMaterialReceiverRequest) {
         materialReceiverService.create(requestToMaterialReceiverFunction.apply(postMaterialReceiverRequest));
+
+        Member member = memberService.find(postMaterialReceiverRequest.getMember()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_MATERIAL_RECEIVER_CREATION_TEMPLATE, member.getOrganization().getName()))
+                .build());
+
         return materialReceiverService.findByMemberAndMaterial(
                         memberService.find(postMaterialReceiverRequest.getMember()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
                         materialService.find(postMaterialReceiverRequest.getMaterial()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -119,7 +133,18 @@ public class MaterialReceiverDefaultController implements MaterialReceiverContro
     public void deleteMaterialReceiver(BigInteger id) {
         materialReceiverService.find(id)
                 .ifPresentOrElse(
-                        materialReceiver -> materialReceiverService.delete(id),
+                        materialReceiver -> {
+                            materialReceiverService.delete(id);
+
+                            notificationService.create(Notification.builder()
+                                    .member(materialReceiver.getMember())
+                                    .content(String.format(
+                                            Constants.NOTIFICATION_MATERIAL_RECEIVER_DELETION_TEMPLATE,
+                                            materialReceiver.getMaterial().getTitle(),
+                                            materialReceiver.getMember().getOrganization())
+                                    )
+                                    .build());
+                        },
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }

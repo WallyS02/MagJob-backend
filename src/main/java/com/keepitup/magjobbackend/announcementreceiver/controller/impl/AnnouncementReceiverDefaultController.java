@@ -12,8 +12,11 @@ import com.keepitup.magjobbackend.announcementreceiver.function.AnnouncementRece
 import com.keepitup.magjobbackend.announcementreceiver.function.RequestToAnnouncementReceiverFunction;
 import com.keepitup.magjobbackend.announcementreceiver.function.UpdateAnnouncementReceiverWithRequestFunction;
 import com.keepitup.magjobbackend.announcementreceiver.service.impl.AnnouncementReceiverDefaultService;
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +34,7 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
     private final AnnouncementReceiverDefaultService announcementReceiverService;
     private final AnnouncementDefaultService announcementService;
     private final MemberDefaultService memberService;
+    private final NotificationDefaultService notificationService;
     private final AnnouncementReceiverToResponseFunction announcementReceiverToResponseFunction;
     private final AnnouncementReceiversToResponseFunction announcementReceiversToResponseFunction;
     private final RequestToAnnouncementReceiverFunction requestToAnnouncementReceiverFunction;
@@ -41,6 +45,7 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
             AnnouncementReceiverDefaultService announcementReceiverService,
             AnnouncementDefaultService announcementService,
             MemberDefaultService memberService,
+            NotificationDefaultService notificationService,
             AnnouncementReceiverToResponseFunction announcementReceiverToResponseFunction,
             AnnouncementReceiversToResponseFunction announcementReceiversToResponseFunction,
             RequestToAnnouncementReceiverFunction requestToAnnouncementReceiverFunction,
@@ -49,6 +54,7 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
         this.announcementReceiverService = announcementReceiverService;
         this.announcementService = announcementService;
         this.memberService = memberService;
+        this.notificationService = notificationService;
         this.announcementReceiverToResponseFunction = announcementReceiverToResponseFunction;
         this.announcementReceiversToResponseFunction = announcementReceiversToResponseFunction;
         this.requestToAnnouncementReceiverFunction = requestToAnnouncementReceiverFunction;
@@ -98,6 +104,16 @@ public class AnnouncementReceiverDefaultController implements AnnouncementReceiv
     @Override
     public GetAnnouncementReceiverResponse createAnnouncementReceiver(PostAnnouncementReceiverRequest postAnnouncementReceiverRequest) {
         announcementReceiverService.create(requestToAnnouncementReceiverFunction.apply(postAnnouncementReceiverRequest));
+
+        Member member = memberService.find(postAnnouncementReceiverRequest.getMember()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_ANNOUNCEMENT_RECEIVER_CREATION_TEMPLATE, member.getOrganization().getName()))
+                .build());
+
         return announcementReceiverService.findByMemberAndAnnouncement(
                         memberService.find(postAnnouncementReceiverRequest.getMember()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
                         announcementService.find(postAnnouncementReceiverRequest.getAnnouncement()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)))

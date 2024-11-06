@@ -1,7 +1,10 @@
 package com.keepitup.magjobbackend.user.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.jwt.CustomJwt;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.user.controller.api.UserController;
 import com.keepitup.magjobbackend.user.dto.*;
 import com.keepitup.magjobbackend.user.entity.User;
@@ -23,6 +26,7 @@ import java.util.UUID;
 @Log
 public class UserDefaultController implements UserController {
     private final UserDefaultService service;
+    private final NotificationDefaultService notificationService;
     private final UserToResponseFunction userToResponse;
     private final UsersToResponseFunction usersToResponse;
     private final RequestToUserFunction requestToUser;
@@ -32,6 +36,7 @@ public class UserDefaultController implements UserController {
     @Autowired
     public UserDefaultController(
             UserDefaultService service,
+            NotificationDefaultService notificationService,
             UserToResponseFunction userToResponse,
             UsersToResponseFunction usersToResponse,
             RequestToUserFunction requestToUser,
@@ -40,6 +45,7 @@ public class UserDefaultController implements UserController {
             SecurityService securityService
     ) {
         this.service = service;
+        this.notificationService = notificationService;
         this.userToResponse = userToResponse;
         this.usersToResponse = usersToResponse;
         this.requestToUser = requestToUser;
@@ -120,7 +126,14 @@ public class UserDefaultController implements UserController {
 
         service.find(id)
                 .ifPresentOrElse(
-                    user -> service.update(updateUserWithRequest.apply(user, patchUserRequest)),
+                    user -> {
+                        service.update(updateUserWithRequest.apply(user, patchUserRequest));
+
+                        notificationService.create(Notification.builder()
+                                .user(user)
+                                .content(Constants.NOTIFICATION_USER_UPDATE_TEMPLATE)
+                                .build());
+                    },
                     () -> {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                     }

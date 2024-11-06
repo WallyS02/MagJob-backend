@@ -11,6 +11,10 @@ import com.keepitup.magjobbackend.assignee.function.RequestToAssigneeFunction;
 import com.keepitup.magjobbackend.assignee.service.api.AssigneeService;
 import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.SecurityService;
+import com.keepitup.magjobbackend.member.entity.Member;
+import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.task.entity.Task;
 import com.keepitup.magjobbackend.task.service.api.TaskService;
@@ -33,6 +37,8 @@ public class AssigneeDefaultController implements AssigneeController {
     private final AssigneeToResponseFunction assigneeToResponse;
     private final AssigneesToResponseFunction assigneesToResponse;
     private final TaskService taskService;
+    private final NotificationDefaultService notificationService;
+    private final MemberDefaultService memberService;
     private final SecurityService securityService;
 
     public AssigneeDefaultController(
@@ -41,6 +47,8 @@ public class AssigneeDefaultController implements AssigneeController {
             AssigneeToResponseFunction assigneeToResponse,
             AssigneesToResponseFunction assigneesToResponse,
             TaskService taskService,
+            NotificationDefaultService notificationService,
+            MemberDefaultService memberService,
             SecurityService securityService
     ) {
         this.service = service;
@@ -48,6 +56,8 @@ public class AssigneeDefaultController implements AssigneeController {
         this.assigneeToResponse = assigneeToResponse;
         this.assigneesToResponse = assigneesToResponse;
         this.taskService = taskService;
+        this.notificationService = notificationService;
+        this.memberService = memberService;
         this.securityService = securityService;
     }
 
@@ -73,6 +83,10 @@ public class AssigneeDefaultController implements AssigneeController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getOrganization();
 
+        Member member = memberService.find(request.getMember()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
         if (!securityService.hasPermission(organization, Constants.PERMISSION_NAME_CAN_MANAGE_TASKS)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -85,6 +99,11 @@ public class AssigneeDefaultController implements AssigneeController {
         } else {
             service.create(requestToAssignee.apply(request));
         }
+
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_ASSIGNEE_CREATION_TEMPLATE, organization.getName()))
+                .build());
 
         return service.findByMemberAndTask(request.getMember(), request.getTask())
                 .map(assigneeToResponse)
@@ -123,7 +142,14 @@ public class AssigneeDefaultController implements AssigneeController {
 
         service.findByMemberAndTask(request.getMember(), request.getTask())
                 .ifPresentOrElse(
-                        assignee -> service.delete(request.getMember(), request.getTask()),
+                        assignee -> {
+                            service.delete(request.getMember(), request.getTask());
+
+                            notificationService.create(Notification.builder()
+                                    .member(assignee.getMember())
+                                    .content(String.format(Constants.NOTIFICATION_ASSIGNEE_DELETION_TEMPLATE, organization.getName()))
+                                    .build());
+                        },
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }

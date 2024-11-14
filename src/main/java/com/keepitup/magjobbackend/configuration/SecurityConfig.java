@@ -65,7 +65,17 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/role-members"),
             new AntPathRequestMatcher("/api/role-members/{id}"),
             new AntPathRequestMatcher("/api/roles/{roleId}/role-members"),
-            new AntPathRequestMatcher("/api/members/{memberId}/role-members")
+            new AntPathRequestMatcher("/api/members/{memberId}/role-members"),
+            new AntPathRequestMatcher("/api/notifications"),
+            new AntPathRequestMatcher("/api/notifications/seen/{seen}"),
+            new AntPathRequestMatcher("/api/notifications/sent/{sent}"),
+            new AntPathRequestMatcher("/api/notifications/{id}"),
+            new AntPathRequestMatcher("/api/organizations/{organizationId}/notifications"),
+            new AntPathRequestMatcher("/api/organizations/{organizationId}/notifications/{seen}"),
+            new AntPathRequestMatcher("/api/members/{memberId}/notifications"),
+            new AntPathRequestMatcher("/api/members/{memberId}/notifications/{seen}"),
+            new AntPathRequestMatcher("/api/users/{userId}/notifications"),
+            new AntPathRequestMatcher("/api/users/{userId}/notifications/{seen}")
     };
 
     @Bean

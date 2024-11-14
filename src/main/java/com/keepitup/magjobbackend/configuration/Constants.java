@@ -13,7 +13,12 @@ public class Constants {
     public static final String PERMISSION_NAME_CAN_MANAGE_INVITATIONS = "canManageInvitations";
     public static final String PERMISSION_NAME_CAN_MANAGE_ROLES = "canManageRoles";
 
-    //Notification templates
+    //Notifications
+    public static final String NOTIFICATION_USER_DEFAULT_WEBSOCKET_ENDPOINT = "/topic/user";
+    public static final String NOTIFICATION_MEMBER_DEFAULT_WEBSOCKET_ENDPOINT = "/topic/member";
+    public static final String NOTIFICATION_ORGANIZATION_DEFAULT_WEBSOCKET_ENDPOINT = "/topic/organization";
+    public static final String NOTIFICATION_ENDPOINT = "/notifications";
+
     public static final String NOTIFICATION_USER_UPDATE_TEMPLATE = "User profile has been updated";
     public static final String NOTIFICATION_INVITATION_CREATION_TEMPLATE = "You have been invited to organization %s";
     public static final String NOTIFICATION_INVITATION_ACCEPT_TEMPLATE = "You have joined organization %s";

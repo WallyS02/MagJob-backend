@@ -27,7 +27,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -83,8 +82,6 @@ public class NotificationDefaultController implements NotificationController {
             System.out.println(securityService.hasAdminPermission());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
-        System.out.println("co?");
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Integer count = notificationService.findAllBySeen(seen, Pageable.unpaged()).getNumberOfElements();

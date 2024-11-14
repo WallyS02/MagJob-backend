@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.notification.service.impl;
 
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.notification.entity.Notification;
 import com.keepitup.magjobbackend.notification.respository.api.NotificationRepository;
@@ -9,10 +10,12 @@ import com.keepitup.magjobbackend.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +23,12 @@ import java.util.Optional;
 @Service
 public class NotificationDefaultService implements NotificationService {
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public NotificationDefaultService(NotificationRepository notificationRepository) {
+    public NotificationDefaultService(NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate) {
         this.notificationRepository = notificationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -86,7 +91,42 @@ public class NotificationDefaultService implements NotificationService {
         notification.setDateOfCreation(LocalDateTime.now());
         notification.setSeen(false);
         notification.setSent(false);
+
+        sendNotificationToWebSocket(notification);
+
         return notificationRepository.save(notification);
+    }
+
+    @Override
+    public void sendNotificationToWebSocket(Notification notification) {
+        String destination;
+
+        if (notification.getUser() != null) {
+            destination = String.join(
+                    "",
+                    Constants.NOTIFICATION_USER_DEFAULT_WEBSOCKET_ENDPOINT,
+                    notification.getUser().getId().toString(),
+                    Constants.NOTIFICATION_ENDPOINT
+            );
+        } else if (notification.getMember() != null) {
+            destination = String.join(
+                    "",
+                    Constants.NOTIFICATION_MEMBER_DEFAULT_WEBSOCKET_ENDPOINT,
+                    notification.getMember().getId().toString(),
+                    Constants.NOTIFICATION_ENDPOINT
+            );
+        } else if (notification.getOrganization() != null) {
+            destination = String.join(
+                    "",
+                    Constants.NOTIFICATION_ORGANIZATION_DEFAULT_WEBSOCKET_ENDPOINT,
+                    notification.getOrganization().getId().toString(),
+                    Constants.NOTIFICATION_ENDPOINT
+            );
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        messagingTemplate.convertAndSend(destination, notification);
     }
 
     @Override

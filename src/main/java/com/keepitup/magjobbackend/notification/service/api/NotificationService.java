@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +24,7 @@ public interface NotificationService {
     Page<Notification> findAllByUser(User user, Pageable pageable);
     Page<Notification> findAllByUserAndSeen(User user, Boolean seen, Pageable pageable);
     Notification create(Notification notification);
+    void sendNotificationToWebSocket(Notification notification);
     void update(Notification notification);
     void delete(BigInteger id);
 

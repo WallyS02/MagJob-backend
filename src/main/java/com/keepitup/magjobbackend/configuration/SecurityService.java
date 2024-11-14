@@ -130,4 +130,11 @@ public class SecurityService {
         return chat.getChatAdministrators().stream()
                 .anyMatch(chatMember -> chatMember.getMember().equals(member));
     }
+
+    public boolean isChatMember(Chat chat) {
+        Member member = getCurrentMember(chat.getOrganization());
+
+        return chat.getChatMembers().stream()
+                .anyMatch(chatMember -> chatMember.getMember().equals(member));
+    }
 }

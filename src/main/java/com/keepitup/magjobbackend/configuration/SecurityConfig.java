@@ -65,7 +65,8 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/role-members"),
             new AntPathRequestMatcher("/api/role-members/{id}"),
             new AntPathRequestMatcher("/api/roles/{roleId}/role-members"),
-            new AntPathRequestMatcher("/api/members/{memberId}/role-members")
+            new AntPathRequestMatcher("/api/members/{memberId}/role-members"),
+            new AntPathRequestMatcher("/chat/**")
     };
 
     @Bean

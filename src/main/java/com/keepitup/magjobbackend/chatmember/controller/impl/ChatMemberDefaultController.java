@@ -10,6 +10,7 @@ import com.keepitup.magjobbackend.chatmember.function.ChatMembersToResponseFunct
 import com.keepitup.magjobbackend.chatmember.function.RequestToChatMemberFunction;
 import com.keepitup.magjobbackend.chatmember.function.UpdateChatMemberWithRequestFunction;
 import com.keepitup.magjobbackend.chatmember.service.api.ChatMemberService;
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,6 +32,7 @@ public class ChatMemberDefaultController implements ChatMemberController {
     private final MemberService memberService;
     private final SecurityService securityService;
     private final ChatService chatService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private final ChatMemberToResponseFunction chatMemberToResponseFunction;
     private final ChatMembersToResponseFunction chatMembersToResponseFunction;
@@ -42,6 +45,7 @@ public class ChatMemberDefaultController implements ChatMemberController {
             MemberService memberService,
             SecurityService securityService,
             ChatService chatService,
+            SimpMessagingTemplate messagingTemplate,
             ChatMemberToResponseFunction chatMemberToResponseFunction,
             ChatMembersToResponseFunction chatMembersToResponseFunction,
             RequestToChatMemberFunction requestToChatMemberFunction,
@@ -51,6 +55,7 @@ public class ChatMemberDefaultController implements ChatMemberController {
         this.memberService = memberService;
         this.securityService = securityService;
         this.chatService = chatService;
+        this.messagingTemplate = messagingTemplate;
         this.chatMemberToResponseFunction = chatMemberToResponseFunction;
         this.chatMembersToResponseFunction = chatMembersToResponseFunction;
         this.requestToChatMemberFunction = requestToChatMemberFunction;
@@ -150,6 +155,11 @@ public class ChatMemberDefaultController implements ChatMemberController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        messagingTemplate.convertAndSend(
+                Constants.CHAT_DEFAULT_WEBSOCKET_ENDPOINT + chat.getId(),
+                String.join(Constants.CHAT_JOIN_MESSAGE, invitation.getNickname())
+        );
+
         chatMemberService.acceptInvitation(invitation);
     }
 
@@ -168,6 +178,11 @@ public class ChatMemberDefaultController implements ChatMemberController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        messagingTemplate.convertAndSend(
+                Constants.CHAT_LEAVE_MESSAGE + invitation.getChat().getId(),
+                String.join(Constants.CHAT_DELETE_ADMIN_MESSAGE, invitation.getNickname())
+        );
+
         chatMemberService.delete(invitation.getId());
     }
 
@@ -184,6 +199,11 @@ public class ChatMemberDefaultController implements ChatMemberController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        messagingTemplate.convertAndSend(
+                Constants.CHAT_DEFAULT_WEBSOCKET_ENDPOINT + chatMember.getChat().getId(),
+                String.join(Constants.CHAT_DELETE_ADMIN_MESSAGE, chatMember.getNickname())
+        );
+
         chatService.removeAdmin(chatMember.getChat(), chatMember);
     }
 
@@ -199,6 +219,11 @@ public class ChatMemberDefaultController implements ChatMemberController {
         if (!securityService.isChatAdmin(chatMember.getChat())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        messagingTemplate.convertAndSend(
+                Constants.CHAT_DEFAULT_WEBSOCKET_ENDPOINT + chatMember.getChat().getId(),
+                String.join(Constants.CHAT_ADD_ADMIN_MESSAGE, chatMember.getNickname())
+        );
 
         chatService.addAdmin(chatMember.getChat(), chatMember);
     }

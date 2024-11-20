@@ -29,6 +29,9 @@ public class GetChatMembersResponse {
 
         @Schema(description = "Chat member nickname value")
         private String nickname;
+
+        @Schema(description = "Member id value")
+        private BigInteger memberId;
     }
 
     @Singular

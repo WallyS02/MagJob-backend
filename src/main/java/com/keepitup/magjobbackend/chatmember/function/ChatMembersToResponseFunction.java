@@ -16,6 +16,7 @@ public class ChatMembersToResponseFunction implements BiFunction<Page<ChatMember
                         .map(chatMember -> GetChatMembersResponse.ChatMember.builder()
                                 .id(chatMember.getId())
                                 .nickname(chatMember.getNickname())
+                                .memberId(chatMember.getMember().getId())
                                 .build())
                         .toList())
                 .count(count)

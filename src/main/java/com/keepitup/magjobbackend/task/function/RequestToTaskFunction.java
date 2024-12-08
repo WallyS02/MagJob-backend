@@ -22,7 +22,7 @@ public class RequestToTaskFunction implements Function<PostTaskRequest, Task> {
                         .id(request.getOrganization())
                         .build())
                 .creator(Member.builder()
-                        .id(request.getOrganization())
+                        .id(request.getCreator())
                         .build())
                 .build();
     }

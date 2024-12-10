@@ -13,4 +13,11 @@ public class Constants {
     public static final String PERMISSION_NAME_CAN_MANAGE_INVITATIONS = "canManageInvitations";
     public static final String PERMISSION_NAME_CAN_MANAGE_ROLES = "canManageRoles";
 
+    //Chats
+    public static final String CHAT_DEFAULT_WEBSOCKET_ENDPOINT = "/topic/chat";
+
+    public static final String CHAT_JOIN_MESSAGE = "Chat member %s has joined chat";
+    public static final String CHAT_LEAVE_MESSAGE = "Chat member %s has left chat";
+    public static final String CHAT_ADD_ADMIN_MESSAGE = "Chat member %s has been granted administrator privileges";
+    public static final String CHAT_DELETE_ADMIN_MESSAGE = "Chat member %s is no longer administrator in this chat";
 }

@@ -1,5 +1,9 @@
 package com.keepitup.magjobbackend.organization.controller.impl;
 
+import com.keepitup.magjobbackend.chat.entity.Chat;
+import com.keepitup.magjobbackend.chat.service.api.ChatService;
+import com.keepitup.magjobbackend.chatmember.entity.ChatMember;
+import com.keepitup.magjobbackend.chatmember.service.api.ChatMemberService;
 import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
@@ -28,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +48,8 @@ public class OrganizationDefaultController implements OrganizationController {
     private final UserService userService;
     private final RoleService roleService;
     private final RoleMemberService roleMemberService;
+    private final ChatService chatService;
+    private final ChatMemberService chatMemberService;
     private final KeycloakController keycloakController;
     private final SecurityService securityService;
 
@@ -59,6 +64,8 @@ public class OrganizationDefaultController implements OrganizationController {
             OrganizationToResponseFunction organizationToResponse,
             RequestToOrganizationFunction requestToOrganization,
             UpdateOrganizationWithRequestFunction updateOrganizationWithRequest,
+            ChatService chatService,
+            ChatMemberService chatMemberService,
             KeycloakController keycloakController,
             SecurityService securityService
     ) {
@@ -71,6 +78,8 @@ public class OrganizationDefaultController implements OrganizationController {
         this.organizationToResponse = organizationToResponse;
         this.requestToOrganization = requestToOrganization;
         this.updateOrganizationWithRequest = updateOrganizationWithRequest;
+        this.chatService = chatService;
+        this.chatMemberService = chatMemberService;
         this.keycloakController = keycloakController;
         this.securityService = securityService;
     }
@@ -180,6 +189,8 @@ public class OrganizationDefaultController implements OrganizationController {
                             .role(ownerRole.get())
                             .member(ownerMember.get())
                             .build());
+
+                    createInitialChat(createdOrganization.get(), ownerMember.get());
                 }
             }
         }
@@ -217,5 +228,29 @@ public class OrganizationDefaultController implements OrganizationController {
 
         service.update(updateOrganizationWithRequest.apply(organization.get(), patchOrganizationRequest));
         return getOrganization(id);
+    }
+
+    private void createInitialChat(Organization organization, Member admin) {
+        String chatName = "Main chat - " + organization.getName();
+
+        chatService.create(Chat.builder()
+                .title(chatName)
+                .organization(organization)
+                .build());
+        Optional<Chat> createdChat = chatService.findByTitle(chatName);
+
+        if (createdChat.isPresent()) {
+            chatMemberService.acceptInvitation(ChatMember.builder()
+                    .chat(createdChat.get())
+                    .nickname(admin.getPseudonym())
+                    .isInvitationAccepted(true)
+                    .member(admin)
+                    .build());
+
+            ChatMember adminChatMember = chatMemberService.findByMemberAndChat(admin, createdChat.get())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+            chatService.addAdmin(createdChat.get(), adminChatMember);
+        }
     }
 }

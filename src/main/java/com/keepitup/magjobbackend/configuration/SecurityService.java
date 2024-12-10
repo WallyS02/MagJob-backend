@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.configuration;
 
+import com.keepitup.magjobbackend.chat.entity.Chat;
 import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.organization.entity.Organization;
@@ -95,6 +96,13 @@ public class SecurityService {
         return jwt.getMembershipMap().containsKey(organization.getName());
     }
 
+    public boolean belongsToChat(Chat chat, Organization organization) {
+        Member member = getCurrentMember(organization);
+
+        return chat.getChatMembers().stream()
+                .anyMatch(chatMember -> chatMember.getMember().equals(member));
+    }
+
     public Member getCurrentMember(Organization organization) {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
         UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
@@ -135,5 +143,19 @@ public class SecurityService {
         }
 
         return userRoles.contains(Constants.ROLE_NAME_OWNER);
+    }
+
+    public boolean isChatAdmin(Chat chat) {
+        Member member = getCurrentMember(chat.getOrganization());
+
+        return chat.getChatAdministrators().stream()
+                .anyMatch(chatMember -> chatMember.getMember().equals(member));
+    }
+
+    public boolean isChatMember(Chat chat) {
+        Member member = getCurrentMember(chat.getOrganization());
+
+        return chat.getChatMembers().stream()
+                .anyMatch(chatMember -> chatMember.getMember().equals(member));
     }
 }

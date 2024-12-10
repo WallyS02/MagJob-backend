@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.member.entity;
 
 import com.keepitup.magjobbackend.announcementreceiver.entity.AnnouncementReceiver;
 import com.keepitup.magjobbackend.assignee.entity.Assignee;
+import com.keepitup.magjobbackend.chatmember.entity.ChatMember;
 import com.keepitup.magjobbackend.materialreceiver.entity.MaterialReceiver;
 import com.keepitup.magjobbackend.notification.entity.Notification;
 import com.keepitup.magjobbackend.organization.entity.Organization;
@@ -58,6 +59,9 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<RoleMember> roleMembers;
 
+    @OneToMany(mappedBy = "member")
+    private List<ChatMember> chatMembers;
+  
     @OneToMany(mappedBy = "member")
     private List<Notification> notifications;
 }

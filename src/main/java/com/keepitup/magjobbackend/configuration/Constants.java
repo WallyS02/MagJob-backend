@@ -35,4 +35,12 @@ public class Constants {
     public static final String NOTIFICATION_ASSIGNEE_CREATION_TEMPLATE = "You have been assigned a new task in organization %s";
     public static final String NOTIFICATION_ASSIGNEE_DELETION_TEMPLATE = "You have been removed from a task in organization %s";
     public static final String NOTIFICATION_ANNOUNCEMENT_RECEIVER_CREATION_TEMPLATE = "New announcement in organization %s";
+  
+    //Chats
+    public static final String CHAT_DEFAULT_WEBSOCKET_ENDPOINT = "/topic/chat";
+
+    public static final String CHAT_JOIN_MESSAGE = "Chat member %s has joined chat";
+    public static final String CHAT_LEAVE_MESSAGE = "Chat member %s has left chat";
+    public static final String CHAT_ADD_ADMIN_MESSAGE = "Chat member %s has been granted administrator privileges";
+    public static final String CHAT_DELETE_ADMIN_MESSAGE = "Chat member %s is no longer administrator in this chat";
 }

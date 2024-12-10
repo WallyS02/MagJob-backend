@@ -76,6 +76,22 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/members/{memberId}/notifications/{seen}"),
             new AntPathRequestMatcher("/api/users/{userId}/notifications"),
             new AntPathRequestMatcher("/api/users/{userId}/notifications/{seen}")
+            new AntPathRequestMatcher("/api/chats"),
+            new AntPathRequestMatcher("/api/chats/{id}"),
+            new AntPathRequestMatcher("/api/organizations/{organizationId}/chats"),
+            new AntPathRequestMatcher("/api/members/{memberId}/chats"),
+            new AntPathRequestMatcher("/api/members/{memberId}/chat-members"),
+            new AntPathRequestMatcher("/api/chats/{chatId}/chat-members"),
+            new AntPathRequestMatcher("/api/chat-members"),
+            new AntPathRequestMatcher("/api/chat-members/{id}"),
+            new AntPathRequestMatcher("/api/chat-members/accept"),
+            new AntPathRequestMatcher("/api/chat-members/reject"),
+            new AntPathRequestMatcher("/api/chat-members/{id}/admin/remove"),
+            new AntPathRequestMatcher("/api/chat-members/{id}/admin/add"),
+            new AntPathRequestMatcher("/api/chats/{id}/chat-messages"),
+            new AntPathRequestMatcher("/api/messages/{id}"),
+            new AntPathRequestMatcher("/api/chat/{chatId}/sendMessage"),
+            new AntPathRequestMatcher("/api/chat/{chatId}/messageViewed")
     };
 
     @Bean

@@ -1,6 +1,7 @@
 package com.keepitup.magjobbackend.organization.entity;
 
 import com.keepitup.magjobbackend.announcement.entity.Announcement;
+import com.keepitup.magjobbackend.chat.entity.Chat;
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
 import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.member.entity.Member;
@@ -61,6 +62,9 @@ public class Organization {
     @OneToMany(mappedBy = "organization")
     private List<Material> materials;
 
+    @OneToMany(mappedBy = "organization")
+    private List<Chat> chats;
+  
     @OneToMany(mappedBy = "organization")
     private List<Notification> notifications;
 }

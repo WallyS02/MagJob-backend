@@ -10,6 +10,8 @@ import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.organization.controller.api.OrganizationController;
 import com.keepitup.magjobbackend.organization.dto.*;
 import com.keepitup.magjobbackend.organization.entity.Organization;
@@ -48,6 +50,7 @@ public class OrganizationDefaultController implements OrganizationController {
     private final UserService userService;
     private final RoleService roleService;
     private final RoleMemberService roleMemberService;
+    private final NotificationDefaultService notificationService;
     private final ChatService chatService;
     private final ChatMemberService chatMemberService;
     private final KeycloakController keycloakController;
@@ -60,6 +63,7 @@ public class OrganizationDefaultController implements OrganizationController {
             UserService userService,
             RoleService roleService,
             RoleMemberService roleMemberService,
+            NotificationDefaultService notificationService,
             OrganizationsToResponseFunction organizationsToResponse,
             OrganizationToResponseFunction organizationToResponse,
             RequestToOrganizationFunction requestToOrganization,
@@ -74,6 +78,7 @@ public class OrganizationDefaultController implements OrganizationController {
         this.userService = userService;
         this.roleService = roleService;
         this.roleMemberService = roleMemberService;
+        this.notificationService = notificationService;
         this.organizationsToResponse = organizationsToResponse;
         this.organizationToResponse = organizationToResponse;
         this.requestToOrganization = requestToOrganization;
@@ -192,6 +197,11 @@ public class OrganizationDefaultController implements OrganizationController {
 
                     createInitialChat(createdOrganization.get(), ownerMember.get());
                 }
+
+                notificationService.create(Notification.builder()
+                        .user(user.get())
+                        .content(String.format(Constants.NOTIFICATION_ORGANIZATION_CREATION_TEMPLATE, createdOrganization.get().getName()))
+                        .build());
             }
         }
         return service.findByName(postOrganizationRequest.getName())
@@ -211,7 +221,14 @@ public class OrganizationDefaultController implements OrganizationController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        List<User> users = memberService.findAllUsersByOrganization(id, Pageable.unpaged()).get().stream().toList();
+
         service.delete(id);
+
+        users.forEach(user -> notificationService.create(Notification.builder()
+                .user(user)
+                .content(String.format(Constants.NOTIFICATION_ORGANIZATION_DELETION_TEMPLATE, organization.get().getName()))
+                .build()));
     }
 
     @Override
@@ -227,6 +244,12 @@ public class OrganizationDefaultController implements OrganizationController {
         }
 
         service.update(updateOrganizationWithRequest.apply(organization.get(), patchOrganizationRequest));
+
+        notificationService.create(Notification.builder()
+                .organization(organization.get())
+                .content(String.format(Constants.NOTIFICATION_ORGANIZATION_UPDATE_TEMPLATE, organization.get().getName()))
+                .build());
+
         return getOrganization(id);
     }
 

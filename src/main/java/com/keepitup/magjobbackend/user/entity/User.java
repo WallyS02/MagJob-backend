@@ -2,6 +2,7 @@ package com.keepitup.magjobbackend.user.entity;
 
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
 import com.keepitup.magjobbackend.member.entity.Member;
+import com.keepitup.magjobbackend.notification.entity.Notification;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -56,4 +57,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Invitation> invitations;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
 }

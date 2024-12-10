@@ -5,6 +5,8 @@ import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.service.impl.MemberDefaultService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.role.entity.Role;
 import com.keepitup.magjobbackend.role.service.impl.RoleDefaultService;
@@ -29,13 +31,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class RoleMemberDefaultController implements RoleMemberController {
     private final RoleMemberDefaultService roleMemberService;
     private final RoleDefaultService roleService;
     private final MemberDefaultService memberService;
+    private final NotificationDefaultService notificationService;
     private final RoleMemberToResponseFunction roleMemberToResponseFunction;
     private final RoleMembersToResponseFunction roleMembersToResponseFunction;
     private final RequestToRoleMemberFunction requestToRoleMemberFunction;
@@ -48,6 +53,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
             RoleMemberDefaultService roleMemberService,
             RoleDefaultService roleService,
             MemberDefaultService memberService,
+            NotificationDefaultService notificationService,
             RoleMemberToResponseFunction roleMemberToResponseFunction,
             RoleMembersToResponseFunction roleMembersToResponseFunction,
             RequestToRoleMemberFunction requestToRoleMemberFunction,
@@ -58,6 +64,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
         this.roleMemberService = roleMemberService;
         this.roleService = roleService;
         this.memberService = memberService;
+        this.notificationService = notificationService;
         this.roleMemberToResponseFunction = roleMemberToResponseFunction;
         this.roleMembersToResponseFunction = roleMembersToResponseFunction;
         this.requestToRoleMemberFunction = requestToRoleMemberFunction;
@@ -136,6 +143,10 @@ public class RoleMemberDefaultController implements RoleMemberController {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getUser();
 
+        Member member = memberService.find(postRoleMemberRequest.getMember()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
         Role role = roleService.find(postRoleMemberRequest.getRole()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -155,6 +166,11 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
         keycloakController.addUserToKeycloakGroup(organization.getName(), user.getId(), roleName);
 
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_ROLE_MEMBER_CREATION_TEMPLATE, roleName, organization.getName()))
+                .build());
+
         return roleMemberService.findByMemberAndRole(
                     memberService.find(postRoleMemberRequest.getMember()).orElseThrow(
                             () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
@@ -168,6 +184,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
     @Override
     public GetRoleMembersResponse createRoleMembers(PostRoleMembersRequest postRoleMembersRequest) {
+        Set<BigInteger> memberIds = new HashSet<>();
         Organization organization = roleService.find(postRoleMembersRequest.getRoleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         ).getOrganization();
@@ -181,6 +198,7 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
         for (PostRoleMembersRequest.RoleMember roleMemberRequest : postRoleMembersRequest.getRoleMembers()) {
             BigInteger memberId = roleMemberRequest.getMemberId();
+            memberIds.add(memberId);
 
             Optional<Page<Role>> memberRoles = roleMemberService.findAllRolesByMember(memberId, Pageable.unpaged());
 
@@ -197,6 +215,11 @@ public class RoleMemberDefaultController implements RoleMemberController {
 
         roleMember.setMember(memberService.find(roleMember.getMember().getId()).get());
         roleMemberService.update(roleMember);
+
+        memberIds.forEach(memberId -> notificationService.create(Notification.builder()
+                .member(memberService.find(memberId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .content(String.format(Constants.NOTIFICATION_ROLE_MEMBER_CREATION_TEMPLATE, role.getName(), organization.getName()))
+                .build()));
 
         return roleMembersToResponseFunction.apply(roleMemberService.findAllByRole(
                 role,
@@ -224,6 +247,11 @@ public class RoleMemberDefaultController implements RoleMemberController {
         }
 
         keycloakController.removeUserFromKeycloakGroup(organization.getName(), user.getId(), role.getName());
+
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_ROLE_MEMBER_DELETION_TEMPLATE, role.getName()))
+                .build());
 
         roleMemberService.findByMemberAndRole(member, role)
                 .ifPresentOrElse(

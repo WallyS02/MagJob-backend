@@ -5,11 +5,14 @@ import com.keepitup.magjobbackend.material.dto.GetMaterialResponse;
 import com.keepitup.magjobbackend.material.dto.GetMaterialsResponse;
 import com.keepitup.magjobbackend.material.dto.PatchMaterialRequest;
 import com.keepitup.magjobbackend.material.dto.PostMaterialRequest;
+import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.material.function.MaterialToResponseFunction;
 import com.keepitup.magjobbackend.material.function.MaterialsToResponseFunction;
 import com.keepitup.magjobbackend.material.function.RequestToMaterialFunction;
 import com.keepitup.magjobbackend.material.function.UpdateMaterialWithRequestFunction;
 import com.keepitup.magjobbackend.material.service.impl.MaterialDefaultService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.impl.OrganizationDefaultService;
 import lombok.extern.java.Log;
@@ -28,6 +31,7 @@ import java.util.Optional;
 public class MaterialDefaultController implements MaterialController {
     private final MaterialDefaultService materialService;
     private final OrganizationDefaultService organizationService;
+    private final NotificationDefaultService notificationService;
     private final MaterialToResponseFunction materialToResponseFunction;
     private final MaterialsToResponseFunction materialsToResponseFunction;
     private final RequestToMaterialFunction requestToMaterialFunction;
@@ -37,6 +41,7 @@ public class MaterialDefaultController implements MaterialController {
     public MaterialDefaultController(
             MaterialDefaultService materialService,
             OrganizationDefaultService organizationService,
+            NotificationDefaultService notificationService,
             MaterialToResponseFunction materialToResponseFunction,
             MaterialsToResponseFunction materialsToResponseFunction,
             RequestToMaterialFunction requestToMaterialFunction,
@@ -44,6 +49,7 @@ public class MaterialDefaultController implements MaterialController {
     ) {
         this.materialService = materialService;
         this.organizationService = organizationService;
+        this.notificationService = notificationService;
         this.materialToResponseFunction = materialToResponseFunction;
         this.materialsToResponseFunction = materialsToResponseFunction;
         this.requestToMaterialFunction = requestToMaterialFunction;
@@ -80,6 +86,15 @@ public class MaterialDefaultController implements MaterialController {
     @Override
     public GetMaterialResponse createMaterial(PostMaterialRequest postMaterialRequest) {
         materialService.create(requestToMaterialFunction.apply(postMaterialRequest));
+
+        Optional<Organization> organizationOptional = organizationService.find(postMaterialRequest.getOrganization());
+
+        organizationOptional.ifPresent(organization ->
+                notificationService.create(Notification.builder()
+                        .organization(organization)
+                        .content("New material added in organization " + organization.getName())
+                        .build()));
+
         return materialService.findByTitle(postMaterialRequest.getTitle())
                 .map(materialToResponseFunction)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -89,7 +104,14 @@ public class MaterialDefaultController implements MaterialController {
     public GetMaterialResponse updateMaterial(BigInteger id, PatchMaterialRequest patchMaterialRequest) {
         materialService.find(id)
                 .ifPresentOrElse(
-                        material -> materialService.update(updateMaterialWithRequestFunction.apply(material, patchMaterialRequest)),
+                        material -> {
+                            materialService.update(updateMaterialWithRequestFunction.apply(material, patchMaterialRequest));
+
+                            notificationService.create(Notification.builder()
+                                    .organization(material.getOrganization())
+                                    .content("Material updated in organization " + material.getOrganization().getName())
+                                    .build());
+                        },
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }
@@ -101,7 +123,14 @@ public class MaterialDefaultController implements MaterialController {
     public void deleteMaterial(BigInteger id) {
         materialService.find(id)
                 .ifPresentOrElse(
-                        material -> materialService.delete(id),
+                        material -> {
+                            materialService.delete(id);
+
+                            notificationService.create(Notification.builder()
+                                    .organization(material.getOrganization())
+                                    .content("Material deleted in organization " + material.getOrganization().getName())
+                                    .build());
+                        },
                         () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
                         }

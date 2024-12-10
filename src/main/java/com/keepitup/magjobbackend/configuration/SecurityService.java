@@ -8,6 +8,7 @@ import com.keepitup.magjobbackend.organization.service.api.OrganizationService;
 import com.keepitup.magjobbackend.role.entity.Role;
 import com.keepitup.magjobbackend.role.service.impl.RoleDefaultService;
 import com.keepitup.magjobbackend.task.dto.PostTaskRequest;
+import com.keepitup.magjobbackend.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -110,6 +111,26 @@ public class SecurityService {
                 .filter(member -> member.getUser().getId().equals(loggedInUserId) && member.getIsStillMember())
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+    }
+
+    public boolean isCurrentMember(Member member) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loggedInUserId = UUID.fromString(jwt.getExternalId());
+
+        return loggedInUserId.equals(member.getUser().getId());
+    }
+
+    public boolean isCurrentUser(User user) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        UUID loogedInUserId = UUID.fromString(jwt.getExternalId());
+
+        return loogedInUserId.equals(user.getId());
+    }
+
+    public boolean isAnyMember() {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+
+        return !jwt.getMembershipMap().isEmpty();
     }
 
     public boolean isOwner(Organization organization) {

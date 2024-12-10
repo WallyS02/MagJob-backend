@@ -8,7 +8,6 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.config.annotation.*;
-
 import java.util.List;
 
 @Configuration
@@ -20,11 +19,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
-
+  
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat").withSockJS();
         registry.addEndpoint("/chat").setAllowedOrigins("*");
+        registry.addEndpoint("/notifications").setAllowedOrigins("*").withSockJS();
     }
 
     @Override
@@ -36,6 +36,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         converter.setContentTypeResolver(resolver);
         messageConverters.add(converter);
         return false;
-
     }
 }

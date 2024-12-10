@@ -1,5 +1,6 @@
 package com.keepitup.magjobbackend.member.controller.impl;
 
+import com.keepitup.magjobbackend.configuration.Constants;
 import com.keepitup.magjobbackend.configuration.KeycloakController;
 import com.keepitup.magjobbackend.configuration.SecurityService;
 import com.keepitup.magjobbackend.member.controller.api.MemberController;
@@ -7,6 +8,8 @@ import com.keepitup.magjobbackend.member.dto.*;
 import com.keepitup.magjobbackend.member.entity.Member;
 import com.keepitup.magjobbackend.member.function.*;
 import com.keepitup.magjobbackend.member.service.api.MemberService;
+import com.keepitup.magjobbackend.notification.entity.Notification;
+import com.keepitup.magjobbackend.notification.service.impl.NotificationDefaultService;
 import com.keepitup.magjobbackend.organization.entity.Organization;
 import com.keepitup.magjobbackend.organization.service.api.OrganizationService;
 import com.keepitup.magjobbackend.user.entity.User;
@@ -29,6 +32,7 @@ public class MemberDefaultController implements MemberController {
     private final MemberService service;
     private final UserService userService;
     private final OrganizationService organizationService;
+    private final NotificationDefaultService notificationService;
     private final MembersToResponseFunction membersToResponse;
     private final MembersByOrganizationToResponseFunction membersByOrganizationToResponse;
     private final MemberToResponseFunction memberToResponse;
@@ -42,6 +46,7 @@ public class MemberDefaultController implements MemberController {
             MemberService service,
             UserService userService,
             OrganizationService organizationService,
+            NotificationDefaultService notificationService,
             MembersToResponseFunction membersToResponse,
             MembersByOrganizationToResponseFunction membersByOrganizationToResponse,
             MemberToResponseFunction memberToResponse,
@@ -53,6 +58,7 @@ public class MemberDefaultController implements MemberController {
         this.service = service;
         this.userService = userService;
         this.organizationService = organizationService;
+        this.notificationService = notificationService;
         this.membersToResponse = membersToResponse;
         this.membersByOrganizationToResponse = membersByOrganizationToResponse;
         this.memberToResponse = memberToResponse;
@@ -122,6 +128,11 @@ public class MemberDefaultController implements MemberController {
             service.create(requestToMember.apply(postMemberRequest));
 
             keycloakController.addUserToKeycloakGroup(organization.get().getName(), user.get().getId());
+
+            notificationService.create(Notification.builder()
+                    .user(user.get())
+                    .content(String.format(Constants.NOTIFICATION_MEMBER_CREATION_TEMPLATE, organization.get().getName()))
+                    .build());
         }
         return service.findByUserAndOrganization(user.get(), organization.get())
                 .map(memberToResponse)
@@ -143,6 +154,11 @@ public class MemberDefaultController implements MemberController {
                 memberToDelete.getUser().getId()
         );
 
+        notificationService.create(Notification.builder()
+                .user(memberToDelete.getUser())
+                .content(String.format(Constants.NOTIFICATION_MEMBER_DELETION_TEMPLATE, memberToDelete.getOrganization().getName()))
+                .build());
+
         service.delete(id);
     }
 
@@ -157,6 +173,11 @@ public class MemberDefaultController implements MemberController {
         }
 
         service.update(updateMemberWithRequest.apply(member, patchMemberRequest));
+
+        notificationService.create(Notification.builder()
+                .member(member)
+                .content(String.format(Constants.NOTIFICATION_MEMBER_UPDATE_TEMPLATE, member.getOrganization().getName()))
+                .build());
 
         return getMember(id);
     }

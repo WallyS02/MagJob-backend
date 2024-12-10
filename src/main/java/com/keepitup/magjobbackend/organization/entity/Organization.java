@@ -5,6 +5,7 @@ import com.keepitup.magjobbackend.chat.entity.Chat;
 import com.keepitup.magjobbackend.invitation.entity.Invitation;
 import com.keepitup.magjobbackend.material.entity.Material;
 import com.keepitup.magjobbackend.member.entity.Member;
+import com.keepitup.magjobbackend.notification.entity.Notification;
 import com.keepitup.magjobbackend.role.entity.Role;
 import com.keepitup.magjobbackend.task.entity.Task;
 import jakarta.persistence.*;
@@ -63,4 +64,7 @@ public class Organization {
 
     @OneToMany(mappedBy = "organization")
     private List<Chat> chats;
+  
+    @OneToMany(mappedBy = "organization")
+    private List<Notification> notifications;
 }

@@ -75,7 +75,7 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/members/{memberId}/notifications"),
             new AntPathRequestMatcher("/api/members/{memberId}/notifications/{seen}"),
             new AntPathRequestMatcher("/api/users/{userId}/notifications"),
-            new AntPathRequestMatcher("/api/users/{userId}/notifications/{seen}")
+            new AntPathRequestMatcher("/api/users/{userId}/notifications/{seen}"),
             new AntPathRequestMatcher("/api/chats"),
             new AntPathRequestMatcher("/api/chats/{id}"),
             new AntPathRequestMatcher("/api/organizations/{organizationId}/chats"),

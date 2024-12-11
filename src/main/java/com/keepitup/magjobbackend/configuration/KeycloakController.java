@@ -148,4 +148,8 @@ public class KeycloakController {
 
         return userRepresentation;
     }
+
+    public boolean checkIfUserExists(Set<String> userEmails) {
+        return true;
+    }
 }

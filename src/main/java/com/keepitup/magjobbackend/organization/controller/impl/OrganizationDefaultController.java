@@ -198,11 +198,6 @@ public class OrganizationDefaultController implements OrganizationController {
 
                     createInitialChat(createdOrganization.get(), ownerMember.get());
                 }
-
-                notificationService.create(Notification.builder()
-                        .user(user.get())
-                        .content(String.format(Constants.NOTIFICATION_ORGANIZATION_CREATION_TEMPLATE, createdOrganization.get().getName()))
-                        .build());
             }
         }
         return service.findByName(postOrganizationRequest.getName())

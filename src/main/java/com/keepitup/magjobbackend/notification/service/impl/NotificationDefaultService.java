@@ -126,7 +126,7 @@ public class NotificationDefaultService implements NotificationService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        messagingTemplate.convertAndSend(destination, notification);
+      //  messagingTemplate.convertAndSend(destination, notification);
     }
 
     @Override

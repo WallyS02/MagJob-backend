@@ -150,6 +150,7 @@ public class KeycloakController {
     }
 
     public boolean checkIfUserExists(Set<String> userEmails) {
-        return true;
+        Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+        return keycloak.realm(realm).users().list().size() > 2;
     }
 }

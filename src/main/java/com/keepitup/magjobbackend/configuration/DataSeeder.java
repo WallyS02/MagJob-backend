@@ -45,8 +45,11 @@ public class DataSeeder implements CommandLineRunner {
                 "Tom Organization", "tom.test@gmail.com"
         );
 
-        Map<String, User> createdUsers = seedUsers(users);
-        seedOrganizations(organizations, createdUsers);
+        if (!keycloakController.checkIfUserExists(users.keySet())) {
+            Map<String, User> createdUsers = seedUsers(users);
+            seedOrganizations(organizations, createdUsers);
+        }
+
     }
 
     private Map<String, User> seedUsers(Map<String, String> users) {

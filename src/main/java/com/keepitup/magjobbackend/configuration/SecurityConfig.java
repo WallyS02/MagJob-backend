@@ -3,6 +3,7 @@ package com.keepitup.magjobbackend.configuration;
 
 import com.keepitup.magjobbackend.jwt.CustomJwt;
 import com.keepitup.magjobbackend.jwt.CustomJwtConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -12,14 +13,27 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${local-issuer-uri}")
+    private String standardIssuerUri;
+
     private static final AntPathRequestMatcher[] permitAllList = {
             new AntPathRequestMatcher("/api/users", "POST"),
             /*new AntPathRequestMatcher("/api/users/login")*/
@@ -117,13 +131,40 @@ public class SecurityConfig {
                         .requestMatchers(authenticatedList).authenticated()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(
-                        jwt -> jwt.jwtAuthenticationConverter(customJwtConverter())
-                ));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(customJwtConverter())
+                                .decoder(customJwtDecoder())
+                        )
+                );
         return http.build();
     }
+
     @Bean
     public Converter<Jwt, CustomJwt> customJwtConverter() {
         return new CustomJwtConverter();
+    }
+
+    /*@Bean
+    public JwtDecoder customJwtDecoder() {
+        return new CustomJwtDecoder();
+    }*/
+
+    @Bean
+    public JwtDecoder customJwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(issuerUri + "/protocol/openid-connect/certs").build();
+        jwtDecoder.setJwtValidator(customIssuerValidator(standardIssuerUri, issuerUri));
+        return jwtDecoder;
+    }
+
+    private OAuth2TokenValidator<Jwt> customIssuerValidator(String standardIssuer, String expectedIssuer) {
+        return jwt -> {
+            String issuer = jwt.getIssuer() != null ? jwt.getIssuer().toString() : null;
+            if (Objects.equals(issuer, standardIssuer) || Objects.equals(issuer, expectedIssuer)) {
+                return OAuth2TokenValidatorResult.success();
+            } else {
+                return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Invalid issuer", null));
+            }
+        };
     }
 }

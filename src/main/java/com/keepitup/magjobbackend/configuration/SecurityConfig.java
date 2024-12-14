@@ -145,11 +145,6 @@ public class SecurityConfig {
         return new CustomJwtConverter();
     }
 
-    /*@Bean
-    public JwtDecoder customJwtDecoder() {
-        return new CustomJwtDecoder();
-    }*/
-
     @Bean
     public JwtDecoder customJwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(issuerUri + "/protocol/openid-connect/certs").build();
